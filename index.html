@@ -23,6 +23,7 @@
       --font-size: 16px;
       --line-height: 1.5;
       --content-font-size: 16px;
+      --content-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       --border: #cccccc;
       --shadow: none;
       --radius: 8px;
@@ -180,6 +181,7 @@
       overflow: hidden;
       padding: 0;
       font-size: var(--content-font-size);
+      font-family: var(--content-font-family);
       background: var(--bg);
       -webkit-user-select: text;
       -moz-user-select: text;
@@ -470,6 +472,29 @@
 
     .theme-actions { display:flex; gap: 12px; }
     .theme-preset { display:flex; gap: 8px; }
+
+    .font-select {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--ios-button-radius);
+      background: var(--panel);
+      color: var(--fg);
+      font-family: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all var(--ios-transition);
+    }
+
+    .font-select:hover {
+      border-color: var(--accent);
+    }
+
+    .font-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+    }
 
     /* Shelf sidebar - iOS 风格 */
     .shelf {
@@ -862,6 +887,22 @@
           <input type="range" id="themeFont" min="12" max="22" step="1">
           <label>内容行距</label>
           <input type="range" id="themeLine" min="1.2" max="2.0" step="0.05">
+        </div>
+        <div class="theme-row">
+          <label>字体选择</label>
+          <select id="themeFontFamily" class="font-select">
+            <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">系统默认</option>
+            <option value="'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif">苹方/微软雅黑</option>
+            <option value="'Noto Sans SC', 'Source Han Sans SC', sans-serif">思源黑体</option>
+            <option value="'Noto Serif SC', 'Source Han Serif SC', serif">思源宋体</option>
+            <option value="'FangSong', 'STFangsong', serif">仿宋</option>
+            <option value="'KaiTi', 'STKaiti', serif">楷体</option>
+            <option value="'SimSun', 'STSong', serif">宋体</option>
+            <option value="'Times New Roman', Times, serif">Times New Roman</option>
+            <option value="Georgia, serif">Georgia</option>
+            <option value="Arial, sans-serif">Arial</option>
+            <option value="'Helvetica Neue', Helvetica, sans-serif">Helvetica</option>
+          </select>
         </div>
 
         <div class="theme-row theme-actions">
@@ -2307,6 +2348,23 @@
             try { 
               // 确保渲染后字体大小按用户设置应用
               try { applyFontScale(); } catch {}
+              
+              // 应用字体设置到EPUB内容
+              try {
+                const currentFontFamily = getComputedStyle(document.documentElement).getPropertyValue('--content-font-family').trim();
+                if (currentFontFamily) {
+                  rendition.getContents().forEach(c => {
+                    try {
+                      const d = c.document;
+                      if (!d || !d.head) return;
+                      let s = d.getElementById('content-font-family');
+                      if (!s) { s = d.createElement('style'); s.id = 'content-font-family'; d.head.appendChild(s); }
+                      s.textContent = `html,body,p,div,span,section,article{ font-family: ${currentFontFamily} !important; }`;
+                    } catch {}
+                  });
+                }
+              } catch {}
+              
               rendition.getContents().forEach(c => {
                 applyMarksToDocument(c.document);
                 // 禁用EPUB内容中的双击放大
@@ -2717,6 +2775,7 @@
             muted: getComputedStyle(document.documentElement).getPropertyValue('--muted').trim(),
             font: getComputedStyle(document.documentElement).getPropertyValue('--font-size').trim(),
             line: getComputedStyle(document.documentElement).getPropertyValue('--line-height').trim(),
+            fontFamily: getComputedStyle(document.documentElement).getPropertyValue('--content-font-family').trim(),
             radius: getComputedStyle(document.documentElement).getPropertyValue('--radius').trim(),
 
           };
@@ -2736,6 +2795,7 @@
             if (st.muted) document.documentElement.style.setProperty('--muted', st.muted);
             if (st.font) document.documentElement.style.setProperty('--font-size', st.font);
             if (st.line) document.documentElement.style.setProperty('--line-height', st.line);
+            if (st.fontFamily) document.documentElement.style.setProperty('--content-font-family', st.fontFamily);
             if (st.radius) document.documentElement.style.setProperty('--radius', st.radius);
 
           } catch {}
@@ -2786,6 +2846,7 @@
           const cs = getComputedStyle(document.documentElement);
           const inputFont = document.querySelector('#themeFont');
           const inputLine = document.querySelector('#themeLine');
+          const inputFontFamily = document.querySelector('#themeFontFamily');
           try {
             let storedScale = parseFloat(localStorage.getItem('reader:fontScale') || '');
             if (Number.isNaN(storedScale)) storedScale = fontScale;
@@ -2796,6 +2857,12 @@
           } catch { if (inputFont) { const px = clamp(parseInt((cs.getPropertyValue('--font-size')||'16').trim())||16,12,22); inputFont.value = px; } }
           const lineRaw = parseFloat((cs.getPropertyValue('--line-height')||'1.5').trim())||1.5;
           inputLine && (inputLine.value = clamp(lineRaw,1.2,2.0));
+          
+          // 设置字体选择器的当前值
+          const currentFontFamily = cs.getPropertyValue('--content-font-family').trim() || '-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif';
+          if (inputFontFamily) {
+            inputFontFamily.value = currentFontFamily;
+          }
         }
         window.bindThemeEvents = function(){
           const setVar = (name, value) => { document.documentElement.style.setProperty(name, value); try { window.saveThemeState(); } catch {} try { window.updateStatusBarMeta && window.updateStatusBarMeta(); } catch {} };
@@ -2811,11 +2878,12 @@
             window.bindThemeInputsFromVars();
           };
           const resetTheme = () => {
-            setVar('--bg','#ffffff'); setVar('--fg','#333333'); setVar('--muted','#666666'); setVar('--accent','#0066cc'); setVar('--panel','#f5f5f5'); setVar('--border','#cccccc'); setVar('--font-size','16px'); setVar('--line-height','1.5'); setVar('--radius','4px');
+            setVar('--bg','#ffffff'); setVar('--fg','#333333'); setVar('--muted','#666666'); setVar('--accent','#0066cc'); setVar('--panel','#f5f5f5'); setVar('--border','#cccccc'); setVar('--font-size','16px'); setVar('--line-height','1.5'); setVar('--content-font-family','-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif'); setVar('--radius','4px');
             window.bindThemeInputsFromVars();
           };
           const inputFont = document.querySelector('#themeFont');
           const inputLine = document.querySelector('#themeLine');
+          const inputFontFamily = document.querySelector('#themeFontFamily');
           const btnPresetLight = document.querySelector('#presetLight');
           const btnPresetDark = document.querySelector('#presetDark');
           const btnPresetSepia = document.querySelector('#presetSepia');
@@ -2827,6 +2895,27 @@
             saveFont();
           });
           inputLine && inputLine.addEventListener('input', e=> updateContentLineHeight(e.target.value));
+          inputFontFamily && inputFontFamily.addEventListener('change', e=> {
+            const fontFamily = e.target.value;
+            document.documentElement.style.setProperty('--content-font-family', fontFamily);
+            
+            // 应用到EPUB内容
+            try {
+              if (currentFormat === 'epub' && rendition && rendition.getContents) {
+                rendition.getContents().forEach(c => {
+                  try {
+                    const d = c.document;
+                    if (!d || !d.head) return;
+                    let s = d.getElementById('content-font-family');
+                    if (!s) { s = d.createElement('style'); s.id = 'content-font-family'; d.head.appendChild(s); }
+                    s.textContent = `html,body,p,div,span,section,article{ font-family: ${fontFamily} !important; }`;
+                  } catch {}
+                });
+              }
+            } catch {}
+            
+            try { window.saveThemeState && window.saveThemeState(); } catch {}
+          });
           btnPresetLight && btnPresetLight.addEventListener('click', ()=> applyPreset('light'));
           btnPresetDark && btnPresetDark.addEventListener('click', ()=> applyPreset('dark'));
           btnPresetSepia && btnPresetSepia.addEventListener('click', ()=> applyPreset('sepia'));
