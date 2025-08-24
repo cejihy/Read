@@ -23,7 +23,7 @@
       --font-size: 16px;
       --line-height: 1.5;
       --content-font-size: 16px;
-      --content-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --content-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       --border: #cccccc;
       --shadow: none;
       --radius: 8px;
@@ -472,28 +472,91 @@
 
     .theme-actions { display:flex; gap: 12px; }
     .theme-preset { display:flex; gap: 8px; }
-
+    
+    /* 字体选择器样式 */
     .font-select {
-      flex: 1;
+      width: 100%;
       padding: 8px 12px;
       border: 1px solid var(--border);
-      border-radius: var(--ios-button-radius);
-      background: var(--panel);
+      border-radius: var(--radius);
+      background: var(--bg);
       color: var(--fg);
+      font-size: 14px;
       font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    
+    .font-select:focus {
+      border-color: var(--accent);
+    }
+    
+    .font-select option {
+      background: var(--bg);
+      color: var(--fg);
+    }
+    
+    #customFontRow {
+      margin-top: 8px;
+    }
+    
+    #importFontBtn {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
       font-size: 14px;
       cursor: pointer;
-      transition: all var(--ios-transition);
+      transition: opacity 0.2s ease;
     }
-
-    .font-select:hover {
-      border-color: var(--accent);
+    
+    #importFontBtn:hover {
+      opacity: 0.8;
     }
-
-    .font-select:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+    
+    /* 字体列表样式 */
+    .font-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--panel);
+      margin-top: 8px;
+    }
+    
+    .font-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    
+    .font-item:last-child {
+      border-bottom: none;
+    }
+    
+    .font-item-name {
+      font-weight: 500;
+      color: var(--fg);
+    }
+    
+    .font-item-remove {
+      background: #ff4444;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+    
+    .font-item-remove:hover {
+      opacity: 0.8;
     }
 
     /* Shelf sidebar - iOS 风格 */
@@ -882,29 +945,35 @@
 
       <div class="sidebar theme-drawer" id="themeDrawer">
         <div class="theme-row"><strong style="flex:1">主题设置</strong><button class="btn" id="closeTheme" title="关闭">×</button></div>
+        
+        <!-- 字体设置 -->
+        <div class="theme-row">
+          <label>字体选择</label>
+          <select id="themeFontFamily" class="font-select">
+            <option value="system">系统默认</option>
+            <option value="serif">衬线字体</option>
+            <option value="sans-serif">无衬线字体</option>
+            <option value="monospace">等宽字体</option>
+            <option value="custom">自定义字体</option>
+          </select>
+        </div>
+        
+        <div class="theme-row" id="customFontRow" style="display: none;">
+          <label>导入字体</label>
+          <input type="file" id="customFontInput" accept=".ttf,.otf,.woff,.woff2" style="display: none;">
+          <button class="btn" id="importFontBtn">选择字体文件</button>
+        </div>
+        
+        <div class="theme-row" id="fontManagerRow" style="display: none;">
+          <label>已导入字体</label>
+          <div id="fontList" class="font-list"></div>
+        </div>
+        
         <div class="theme-row">
           <label>字体大小</label>
           <input type="range" id="themeFont" min="12" max="22" step="1">
           <label>内容行距</label>
           <input type="range" id="themeLine" min="1.2" max="2.0" step="0.05">
-        </div>
-        <div class="theme-row">
-          <label>字体选择</label>
-          <select id="themeFontFamily" class="font-select">
-            <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">系统默认</option>
-            <option value="'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif">苹方/微软雅黑</option>
-            <option value="'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif">SF Pro Text</option>
-            <option value="'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif">SF Pro Display</option>
-            <option value="'Noto Sans SC', 'Source Han Sans SC', sans-serif">思源黑体</option>
-            <option value="'Noto Serif SC', 'Source Han Serif SC', serif">思源宋体</option>
-            <option value="'FangSong', 'STFangsong', serif">仿宋</option>
-            <option value="'KaiTi', 'STKaiti', serif">楷体</option>
-            <option value="'SimSun', 'STSong', serif">宋体</option>
-            <option value="'Times New Roman', Times, serif">Times New Roman</option>
-            <option value="Georgia, serif">Georgia</option>
-            <option value="Arial, sans-serif">Arial</option>
-            <option value="'Helvetica Neue', Helvetica, sans-serif">Helvetica</option>
-          </select>
         </div>
 
         <div class="theme-row theme-actions">
@@ -2350,15 +2419,6 @@
             try { 
               // 确保渲染后字体大小按用户设置应用
               try { applyFontScale(); } catch {}
-              
-              // 应用字体设置到EPUB内容
-              try {
-                const currentFontFamily = getComputedStyle(document.documentElement).getPropertyValue('--content-font-family').trim();
-                if (currentFontFamily) {
-                  window.applyFontFamilyToContent && window.applyFontFamilyToContent(currentFontFamily);
-                }
-              } catch {}
-              
               rendition.getContents().forEach(c => {
                 applyMarksToDocument(c.document);
                 // 禁用EPUB内容中的双击放大
@@ -2769,7 +2829,6 @@
             muted: getComputedStyle(document.documentElement).getPropertyValue('--muted').trim(),
             font: getComputedStyle(document.documentElement).getPropertyValue('--font-size').trim(),
             line: getComputedStyle(document.documentElement).getPropertyValue('--line-height').trim(),
-            fontFamily: getComputedStyle(document.documentElement).getPropertyValue('--content-font-family').trim(),
             radius: getComputedStyle(document.documentElement).getPropertyValue('--radius').trim(),
 
           };
@@ -2789,7 +2848,6 @@
             if (st.muted) document.documentElement.style.setProperty('--muted', st.muted);
             if (st.font) document.documentElement.style.setProperty('--font-size', st.font);
             if (st.line) document.documentElement.style.setProperty('--line-height', st.line);
-            if (st.fontFamily) document.documentElement.style.setProperty('--content-font-family', st.fontFamily);
             if (st.radius) document.documentElement.style.setProperty('--radius', st.radius);
 
           } catch {}
@@ -2836,104 +2894,13 @@
         }
         // 暴露到全局用于初始化调用
         window.updateContentLineHeight = updateContentLineHeight;
-        
-        // 应用字体到所有内容格式的函数
-        window.applyFontFamilyToContent = function(fontFamily) {
-          if (!fontFamily) return;
-          
-          // 检测iOS设备
-          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-          
-          // iOS设备特殊处理：确保字体名称正确
-          if (isIOS) {
-            // 替换一些在iOS上可能不支持的字体
-            fontFamily = fontFamily.replace(/'SF Pro Text'/g, '-apple-system');
-            fontFamily = fontFamily.replace(/'SF Pro Display'/g, '-apple-system');
-          }
-          
-          try {
-            // 应用到EPUB内容
-            if (currentFormat === 'epub' && rendition && rendition.getContents) {
-              rendition.getContents().forEach(c => {
-                try {
-                  const d = c.document;
-                  if (!d || !d.head) return;
-                  
-                  // 移除旧的样式
-                  const oldStyle = d.getElementById('content-font-family');
-                  if (oldStyle) oldStyle.remove();
-                  
-                  // 创建新的样式
-                  let s = d.createElement('style');
-                  s.id = 'content-font-family';
-                  d.head.appendChild(s);
-                  
-                  // 更具体的选择器，确保在iOS上生效
-                  s.textContent = `
-                    html, body, p, div, span, section, article, h1, h2, h3, h4, h5, h6, 
-                    .epub-content, .chapter, .content, .text, .paragraph, 
-                    *:not(button):not(input):not(select):not(textarea) {
-                      font-family: ${fontFamily} !important;
-                    }
-                  `;
-                  
-                  // iOS设备强制刷新
-                  if (isIOS) {
-                    // 强制重新计算样式
-                    const allElements = d.querySelectorAll('*');
-                    allElements.forEach(el => {
-                      el.style.fontFamily = fontFamily;
-                    });
-                  }
-                } catch {}
-              });
-            }
-            
-            // 应用到文本和Markdown内容
-            if (currentFormat === 'text' || currentFormat === 'md') {
-              const styleId = 'content-font-family';
-              let st = document.getElementById(styleId);
-              if (!st) { st = document.createElement('style'); st.id = styleId; document.head.appendChild(st); }
-              st.textContent = `
-                #viewer, #viewer .page-content, #viewer .text-content, #viewer .md-content,
-                #viewer p, #viewer div, #viewer span, #viewer h1, #viewer h2, #viewer h3,
-                #viewer h4, #viewer h5, #viewer h6 {
-                  font-family: ${fontFamily} !important;
-                }
-              `;
-              
-              // 重新计算分页
-              setTimeout(() => { 
-                try { 
-                  if (currentFormat === 'text' || currentFormat === 'md') {
-                    calculatePages && calculatePages(); 
-                  }
-                } catch {} 
-              }, 60);
-            }
-            
-            // 应用到HTML内容
-            if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
-              try {
-                const doc = currentIframe.contentDocument;
-                let s = doc.getElementById('content-font-family');
-                if (!s) { s = doc.createElement('style'); s.id = 'content-font-family'; doc.head.appendChild(s); }
-                s.textContent = `
-                  html, body, p, div, span, section, article, h1, h2, h3, h4, h5, h6,
-                  *:not(button):not(input):not(select):not(textarea) {
-                    font-family: ${fontFamily} !important;
-                  }
-                `;
-              } catch {}
-            }
-          } catch {}
-        };
         window.bindThemeInputsFromVars = function() {
           const cs = getComputedStyle(document.documentElement);
           const inputFont = document.querySelector('#themeFont');
           const inputLine = document.querySelector('#themeLine');
           const inputFontFamily = document.querySelector('#themeFontFamily');
+          const customFontRow = document.querySelector('#customFontRow');
+          
           try {
             let storedScale = parseFloat(localStorage.getItem('reader:fontScale') || '');
             if (Number.isNaN(storedScale)) storedScale = fontScale;
@@ -2942,15 +2909,228 @@
             const px = clamp(derivedPx || fallbackPx, 12, 22);
             if (inputFont) inputFont.value = px;
           } catch { if (inputFont) { const px = clamp(parseInt((cs.getPropertyValue('--font-size')||'16').trim())||16,12,22); inputFont.value = px; } }
+          
           const lineRaw = parseFloat((cs.getPropertyValue('--line-height')||'1.5').trim())||1.5;
           inputLine && (inputLine.value = clamp(lineRaw,1.2,2.0));
           
-          // 设置字体选择器的当前值
-          const currentFontFamily = cs.getPropertyValue('--content-font-family').trim() || '-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif';
+          // 设置字体族选择器
           if (inputFontFamily) {
-            inputFontFamily.value = currentFontFamily;
+            inputFontFamily.value = currentFontFamily || 'system';
+          }
+          
+          // 显示/隐藏自定义字体行
+          if (customFontRow) {
+            customFontRow.style.display = (currentFontFamily === 'custom') ? 'block' : 'none';
+          }
+          
+          // 显示/隐藏字体管理器
+          const fontManagerRow = document.querySelector('#fontManagerRow');
+          if (fontManagerRow) {
+            fontManagerRow.style.display = (currentFontFamily === 'custom' && customFonts.size > 0) ? 'block' : 'none';
           }
         }
+        // 字体管理功能
+        let customFonts = new Map(); // 存储自定义字体
+        let currentFontFamily = 'system'; // 当前字体
+        
+        // 加载保存的字体设置
+        function loadFontSettings() {
+          try {
+            const savedFontFamily = localStorage.getItem('reader:fontFamily');
+            if (savedFontFamily) {
+              currentFontFamily = savedFontFamily;
+            }
+            
+            const savedCustomFonts = localStorage.getItem('reader:customFonts');
+            if (savedCustomFonts) {
+              const fontsData = JSON.parse(savedCustomFonts);
+              customFonts = new Map(fontsData);
+              // 重新加载自定义字体
+              customFonts.forEach((fontData, fontName) => {
+                loadCustomFont(fontName, fontData);
+              });
+            }
+          } catch (error) {
+            console.error('加载字体设置失败:', error);
+          }
+        }
+        
+        // 保存字体设置
+        function saveFontSettings() {
+          try {
+            localStorage.setItem('reader:fontFamily', currentFontFamily);
+            const fontsData = Array.from(customFonts.entries());
+            localStorage.setItem('reader:customFonts', JSON.stringify(fontsData));
+          } catch (error) {
+            console.error('保存字体设置失败:', error);
+          }
+        }
+        
+        // 加载自定义字体
+        function loadCustomFont(fontName, fontData) {
+          try {
+            const fontFace = new FontFace(fontName, fontData);
+            fontFace.load().then(() => {
+              document.fonts.add(fontFace);
+              console.log('自定义字体加载成功:', fontName);
+            }).catch(error => {
+              console.error('自定义字体加载失败:', fontName, error);
+            });
+          } catch (error) {
+            console.error('创建字体对象失败:', error);
+          }
+        }
+        
+        // 更新字体列表显示
+        function updateFontList() {
+          const fontList = document.getElementById('fontList');
+          const fontManagerRow = document.getElementById('fontManagerRow');
+          
+          if (!fontList || !fontManagerRow) return;
+          
+          if (customFonts.size === 0) {
+            fontManagerRow.style.display = 'none';
+            return;
+          }
+          
+          fontManagerRow.style.display = 'block';
+          fontList.innerHTML = '';
+          
+          customFonts.forEach((fontData, fontName) => {
+            const fontItem = document.createElement('div');
+            fontItem.className = 'font-item';
+            
+            const fontNameSpan = document.createElement('span');
+            fontNameSpan.className = 'font-item-name';
+            fontNameSpan.textContent = fontName;
+            fontNameSpan.style.fontFamily = `"${fontName}", sans-serif`;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'font-item-remove';
+            removeBtn.textContent = '删除';
+            removeBtn.addEventListener('click', () => {
+              removeCustomFont(fontName);
+            });
+            
+            fontItem.appendChild(fontNameSpan);
+            fontItem.appendChild(removeBtn);
+            fontList.appendChild(fontItem);
+          });
+        }
+        
+        // 删除自定义字体
+        function removeCustomFont(fontName) {
+          try {
+            // 从Map中移除
+            customFonts.delete(fontName);
+            
+            // 如果当前使用的是被删除的字体，切换到系统字体
+            if (currentFontFamily === 'custom' && customFonts.size === 0) {
+              currentFontFamily = 'system';
+              applyFontFamily('system');
+              
+              // 更新选择器
+              const inputFontFamily = document.querySelector('#themeFontFamily');
+              if (inputFontFamily) {
+                inputFontFamily.value = 'system';
+              }
+              
+              const customFontRow = document.querySelector('#customFontRow');
+              if (customFontRow) {
+                customFontRow.style.display = 'none';
+              }
+            }
+            
+            // 保存设置并更新显示
+            saveFontSettings();
+            updateFontList();
+            
+            setStatus(`字体 "${fontName}" 已删除`);
+            
+          } catch (error) {
+            console.error('删除字体失败:', error);
+            setStatus('删除字体失败: ' + error.message);
+          }
+        }
+        
+        // 应用字体到内容
+        function applyFontFamily(fontFamily) {
+          currentFontFamily = fontFamily;
+          
+          // 设置CSS变量
+          let fontStack = '';
+          switch (fontFamily) {
+            case 'system':
+              fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+              break;
+            case 'serif':
+              fontStack = 'Georgia, "Times New Roman", serif';
+              break;
+            case 'sans-serif':
+              fontStack = 'Arial, Helvetica, sans-serif';
+              break;
+            case 'monospace':
+              fontStack = '"Courier New", Courier, monospace';
+              break;
+            case 'custom':
+              // 使用第一个自定义字体，如果没有则使用系统字体
+              if (customFonts.size > 0) {
+                const firstFont = customFonts.keys().next().value;
+                fontStack = `"${firstFont}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+              } else {
+                fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+              }
+              break;
+            default:
+              fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+          }
+          
+          document.documentElement.style.setProperty('--content-font-family', fontStack);
+          
+          // 应用到EPUB内容
+          if (rendition && rendition.themes) {
+            try {
+              rendition.themes.fontFamily(fontStack);
+            } catch (error) {
+              console.error('应用字体到EPUB失败:', error);
+            }
+          }
+          
+          // 应用到其他格式的内容
+          if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+            try {
+              const doc = currentIframe.contentDocument;
+              let style = doc.getElementById('content-font-family');
+              if (!style) {
+                style = doc.createElement('style');
+                style.id = 'content-font-family';
+                doc.head.appendChild(style);
+              }
+              style.textContent = `html, body { font-family: ${fontStack} !important; }`;
+            } catch (error) {
+              console.error('应用字体到HTML内容失败:', error);
+            }
+          }
+          
+          // 应用到文本和Markdown内容
+          if (currentFormat === 'text' || currentFormat === 'md') {
+            try {
+              const styleId = 'content-font-family';
+              let style = document.getElementById(styleId);
+              if (!style) {
+                style = document.createElement('style');
+                style.id = styleId;
+                document.head.appendChild(style);
+              }
+              style.textContent = `#viewer, #viewer .page-content, #viewer .text-content, #viewer .md-content { font-family: ${fontStack} !important; }`;
+            } catch (error) {
+              console.error('应用字体到文本内容失败:', error);
+            }
+          }
+          
+          saveFontSettings();
+        }
+        
         window.bindThemeEvents = function(){
           const setVar = (name, value) => { document.documentElement.style.setProperty(name, value); try { window.saveThemeState(); } catch {} try { window.updateStatusBarMeta && window.updateStatusBarMeta(); } catch {} };
           const applyPreset = (p) => {
@@ -2965,32 +3145,105 @@
             window.bindThemeInputsFromVars();
           };
           const resetTheme = () => {
-            setVar('--bg','#ffffff'); setVar('--fg','#333333'); setVar('--muted','#666666'); setVar('--accent','#0066cc'); setVar('--panel','#f5f5f5'); setVar('--border','#cccccc'); setVar('--font-size','16px'); setVar('--line-height','1.5'); setVar('--content-font-family','-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif'); setVar('--radius','4px');
+            setVar('--bg','#ffffff'); setVar('--fg','#333333'); setVar('--muted','#666666'); setVar('--accent','#0066cc'); setVar('--panel','#f5f5f5'); setVar('--border','#cccccc'); setVar('--font-size','16px'); setVar('--line-height','1.5'); setVar('--radius','4px');
             window.bindThemeInputsFromVars();
           };
           const inputFont = document.querySelector('#themeFont');
           const inputLine = document.querySelector('#themeLine');
           const inputFontFamily = document.querySelector('#themeFontFamily');
+          const customFontRow = document.querySelector('#customFontRow');
+          const importFontBtn = document.querySelector('#importFontBtn');
+          const customFontInput = document.querySelector('#customFontInput');
           const btnPresetLight = document.querySelector('#presetLight');
           const btnPresetDark = document.querySelector('#presetDark');
           const btnPresetSepia = document.querySelector('#presetSepia');
           const btnThemeReset = document.querySelector('#themeReset');
+          
+          // 字体大小控制
           inputFont && inputFont.addEventListener('input', e=> {
             const px = parseInt(e.target.value)||16;
             fontScale = Math.max(0.6, Math.min(2.0, px / 18));
             applyFontScale();
             saveFont();
           });
+          
+          // 行距控制
           inputLine && inputLine.addEventListener('input', e=> updateContentLineHeight(e.target.value));
-          inputFontFamily && inputFontFamily.addEventListener('change', e=> {
-            const fontFamily = e.target.value;
-            document.documentElement.style.setProperty('--content-font-family', fontFamily);
-            
-            // 应用字体到所有内容
-            window.applyFontFamilyToContent && window.applyFontFamilyToContent(fontFamily);
-            
-            try { window.saveThemeState && window.saveThemeState(); } catch {}
+          
+          // 字体族选择
+          inputFontFamily && inputFontFamily.addEventListener('change', e => {
+            const selectedFont = e.target.value;
+            if (selectedFont === 'custom') {
+              customFontRow.style.display = 'block';
+              // 如果有自定义字体，显示字体管理器
+              if (customFonts.size > 0) {
+                const fontManagerRow = document.querySelector('#fontManagerRow');
+                if (fontManagerRow) {
+                  fontManagerRow.style.display = 'block';
+                }
+              }
+            } else {
+              customFontRow.style.display = 'none';
+              const fontManagerRow = document.querySelector('#fontManagerRow');
+              if (fontManagerRow) {
+                fontManagerRow.style.display = 'none';
+              }
+            }
+            applyFontFamily(selectedFont);
           });
+          
+          // 导入字体按钮
+          importFontBtn && importFontBtn.addEventListener('click', () => {
+            customFontInput.click();
+          });
+          
+          // 字体文件选择
+          customFontInput && customFontInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            try {
+              // 检查文件类型
+              const validTypes = ['font/ttf', 'font/otf', 'font/woff', 'font/woff2'];
+              if (!validTypes.includes(file.type) && !file.name.match(/\.(ttf|otf|woff|woff2)$/i)) {
+                alert('请选择有效的字体文件（TTF、OTF、WOFF、WOFF2格式）');
+                return;
+              }
+              
+              // 读取字体文件
+              const arrayBuffer = await file.arrayBuffer();
+              const fontName = file.name.replace(/\.[^/.]+$/, ''); // 移除扩展名
+              
+              // 创建字体URL
+              const fontUrl = URL.createObjectURL(file);
+              
+              // 保存字体数据
+              customFonts.set(fontName, `url(${fontUrl})`);
+              saveFontSettings();
+              
+              // 加载字体
+              loadCustomFont(fontName, `url(${fontUrl})`);
+              
+              // 如果当前选择的是自定义字体，立即应用
+              if (currentFontFamily === 'custom') {
+                applyFontFamily('custom');
+              }
+              
+              // 更新选择器
+              inputFontFamily.value = 'custom';
+              customFontRow.style.display = 'block';
+              
+              // 更新字体列表
+              updateFontList();
+              
+              setStatus(`字体 "${fontName}" 导入成功`);
+              
+            } catch (error) {
+              console.error('导入字体失败:', error);
+              setStatus('导入字体失败: ' + error.message);
+            }
+          });
+          
           btnPresetLight && btnPresetLight.addEventListener('click', ()=> applyPreset('light'));
           btnPresetDark && btnPresetDark.addEventListener('click', ()=> applyPreset('dark'));
           btnPresetSepia && btnPresetSepia.addEventListener('click', ()=> applyPreset('sepia'));
@@ -3674,6 +3927,19 @@
 
       loadFont();
       
+      // 加载字体设置
+      try {
+        loadFontSettings();
+        // 应用保存的字体设置
+        if (currentFontFamily) {
+          applyFontFamily(currentFontFamily);
+        }
+        // 更新字体列表显示
+        updateFontList();
+      } catch (error) {
+        console.error('加载字体设置失败:', error);
+      }
+      
       // 检查IndexedDB是否可用
       function checkIndexedDB() {
         if (!window.indexedDB) {
@@ -3895,20 +4161,6 @@
           window.loadThemeState && window.loadThemeState(); 
         } catch (e) {
           console.warn('加载主题状态失败:', e);
-        }
-        
-        // 加载主题状态后应用字体设置
-        try {
-          const cs = getComputedStyle(document.documentElement);
-          const currentFontFamily = cs.getPropertyValue('--content-font-family').trim();
-          if (currentFontFamily) {
-            // 延迟应用字体，确保内容已加载
-            setTimeout(() => {
-              window.applyFontFamilyToContent && window.applyFontFamilyToContent(currentFontFamily);
-            }, 100);
-          }
-        } catch (e) {
-          console.warn('应用字体设置失败:', e);
         }
         
         try { 
