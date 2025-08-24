@@ -893,6 +893,8 @@
           <select id="themeFontFamily" class="font-select">
             <option value="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">系统默认</option>
             <option value="'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif">苹方/微软雅黑</option>
+            <option value="'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif">SF Pro Text</option>
+            <option value="'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif">SF Pro Display</option>
             <option value="'Noto Sans SC', 'Source Han Sans SC', sans-serif">思源黑体</option>
             <option value="'Noto Serif SC', 'Source Han Serif SC', serif">思源宋体</option>
             <option value="'FangSong', 'STFangsong', serif">仿宋</option>
@@ -2353,15 +2355,7 @@
               try {
                 const currentFontFamily = getComputedStyle(document.documentElement).getPropertyValue('--content-font-family').trim();
                 if (currentFontFamily) {
-                  rendition.getContents().forEach(c => {
-                    try {
-                      const d = c.document;
-                      if (!d || !d.head) return;
-                      let s = d.getElementById('content-font-family');
-                      if (!s) { s = d.createElement('style'); s.id = 'content-font-family'; d.head.appendChild(s); }
-                      s.textContent = `html,body,p,div,span,section,article{ font-family: ${currentFontFamily} !important; }`;
-                    } catch {}
-                  });
+                  window.applyFontFamilyToContent && window.applyFontFamilyToContent(currentFontFamily);
                 }
               } catch {}
               
@@ -2842,6 +2836,99 @@
         }
         // 暴露到全局用于初始化调用
         window.updateContentLineHeight = updateContentLineHeight;
+        
+        // 应用字体到所有内容格式的函数
+        window.applyFontFamilyToContent = function(fontFamily) {
+          if (!fontFamily) return;
+          
+          // 检测iOS设备
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+          
+          // iOS设备特殊处理：确保字体名称正确
+          if (isIOS) {
+            // 替换一些在iOS上可能不支持的字体
+            fontFamily = fontFamily.replace(/'SF Pro Text'/g, '-apple-system');
+            fontFamily = fontFamily.replace(/'SF Pro Display'/g, '-apple-system');
+          }
+          
+          try {
+            // 应用到EPUB内容
+            if (currentFormat === 'epub' && rendition && rendition.getContents) {
+              rendition.getContents().forEach(c => {
+                try {
+                  const d = c.document;
+                  if (!d || !d.head) return;
+                  
+                  // 移除旧的样式
+                  const oldStyle = d.getElementById('content-font-family');
+                  if (oldStyle) oldStyle.remove();
+                  
+                  // 创建新的样式
+                  let s = d.createElement('style');
+                  s.id = 'content-font-family';
+                  d.head.appendChild(s);
+                  
+                  // 更具体的选择器，确保在iOS上生效
+                  s.textContent = `
+                    html, body, p, div, span, section, article, h1, h2, h3, h4, h5, h6, 
+                    .epub-content, .chapter, .content, .text, .paragraph, 
+                    *:not(button):not(input):not(select):not(textarea) {
+                      font-family: ${fontFamily} !important;
+                    }
+                  `;
+                  
+                  // iOS设备强制刷新
+                  if (isIOS) {
+                    // 强制重新计算样式
+                    const allElements = d.querySelectorAll('*');
+                    allElements.forEach(el => {
+                      el.style.fontFamily = fontFamily;
+                    });
+                  }
+                } catch {}
+              });
+            }
+            
+            // 应用到文本和Markdown内容
+            if (currentFormat === 'text' || currentFormat === 'md') {
+              const styleId = 'content-font-family';
+              let st = document.getElementById(styleId);
+              if (!st) { st = document.createElement('style'); st.id = styleId; document.head.appendChild(st); }
+              st.textContent = `
+                #viewer, #viewer .page-content, #viewer .text-content, #viewer .md-content,
+                #viewer p, #viewer div, #viewer span, #viewer h1, #viewer h2, #viewer h3,
+                #viewer h4, #viewer h5, #viewer h6 {
+                  font-family: ${fontFamily} !important;
+                }
+              `;
+              
+              // 重新计算分页
+              setTimeout(() => { 
+                try { 
+                  if (currentFormat === 'text' || currentFormat === 'md') {
+                    calculatePages && calculatePages(); 
+                  }
+                } catch {} 
+              }, 60);
+            }
+            
+            // 应用到HTML内容
+            if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+              try {
+                const doc = currentIframe.contentDocument;
+                let s = doc.getElementById('content-font-family');
+                if (!s) { s = doc.createElement('style'); s.id = 'content-font-family'; doc.head.appendChild(s); }
+                s.textContent = `
+                  html, body, p, div, span, section, article, h1, h2, h3, h4, h5, h6,
+                  *:not(button):not(input):not(select):not(textarea) {
+                    font-family: ${fontFamily} !important;
+                  }
+                `;
+              } catch {}
+            }
+          } catch {}
+        };
         window.bindThemeInputsFromVars = function() {
           const cs = getComputedStyle(document.documentElement);
           const inputFont = document.querySelector('#themeFont');
@@ -2899,20 +2986,8 @@
             const fontFamily = e.target.value;
             document.documentElement.style.setProperty('--content-font-family', fontFamily);
             
-            // 应用到EPUB内容
-            try {
-              if (currentFormat === 'epub' && rendition && rendition.getContents) {
-                rendition.getContents().forEach(c => {
-                  try {
-                    const d = c.document;
-                    if (!d || !d.head) return;
-                    let s = d.getElementById('content-font-family');
-                    if (!s) { s = d.createElement('style'); s.id = 'content-font-family'; d.head.appendChild(s); }
-                    s.textContent = `html,body,p,div,span,section,article{ font-family: ${fontFamily} !important; }`;
-                  } catch {}
-                });
-              }
-            } catch {}
+            // 应用字体到所有内容
+            window.applyFontFamilyToContent && window.applyFontFamilyToContent(fontFamily);
             
             try { window.saveThemeState && window.saveThemeState(); } catch {}
           });
@@ -3820,6 +3895,20 @@
           window.loadThemeState && window.loadThemeState(); 
         } catch (e) {
           console.warn('加载主题状态失败:', e);
+        }
+        
+        // 加载主题状态后应用字体设置
+        try {
+          const cs = getComputedStyle(document.documentElement);
+          const currentFontFamily = cs.getPropertyValue('--content-font-family').trim();
+          if (currentFontFamily) {
+            // 延迟应用字体，确保内容已加载
+            setTimeout(() => {
+              window.applyFontFamilyToContent && window.applyFontFamilyToContent(currentFontFamily);
+            }, 100);
+          }
+        } catch (e) {
+          console.warn('应用字体设置失败:', e);
         }
         
         try { 
