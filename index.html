@@ -1,0 +1,3945 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover, height=device-height">
+  <meta name="msapplication-tap-highlight" content="no">
+  <title>极简电子书阅读器</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMxZjZlZWIiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOCAySDRjLTEuMSAwLTIgLjktMiAydjE2YzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNmMwLTEuMS0uOS0yLTItMnpNMTYgMThINFY0aDEydjE0eiIvPgo8cGF0aCBkPSJNMTAgMTJoNHYyaC00di0yem0wLTRoNHYyaC00Vjh6Ii8+Cjwvc3ZnPgo8L3N2Zz4K">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="阅读器">
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMxZjZlZWIiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOCAySDRjLTEuMSAwLTIgLjktMiAydjE2YzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNmMwLTEuMS0uOS0yLTItMnpNMTYgMThINFY0aDEydjE0eiIvPgo8cGF0aCBkPSJNMTAgMTJoNHYyaC00di0yem0wLTRoNHYyaC00Vjh6Ii8+Cjwvc3ZnPgo8L3N2Zz4K">
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #333333;
+      --muted: #666666;
+      --accent: #007AFF;
+      --panel: #f5f5f5;
+      --font-size: 16px;
+      --line-height: 1.5;
+      --content-font-size: 16px;
+      --border: #cccccc;
+      --shadow: none;
+      --radius: 8px;
+      --vh: 1vh;
+      --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-area-top: env(safe-area-inset-top, 0px);
+      --safe-area-left: env(safe-area-inset-left, 0px);
+      --safe-area-right: env(safe-area-inset-right, 0px);
+
+      --toolbar-height: 60px;
+      --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+      --pwa-content-padding: 3px;
+
+      /* iOS 风格变量 */
+      --ios-button-height: 44px;
+      --ios-button-radius: 8px;
+      --ios-transition: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ios-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      --ios-active-opacity: 0.7;
+    }
+
+    /* 检测iOS设备 */
+    @supports (-webkit-touch-callout: none) {
+      :root {
+        --accent: #007AFF;
+        --radius: 8px;
+        --ios-button-height: 44px;
+      }
+    }
+
+    html, body {
+      height: 100%;
+      height: calc(var(--vh, 1vh) * 100);
+      overflow: hidden;
+      /* iOS 滚动优化 */
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: none;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow: hidden;
+      height: 100vh;
+      height: calc(var(--vh, 1vh) * 100);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      /* iOS 安全区域适配 */
+      padding-top: var(--safe-area-top);
+      padding-bottom: var(--safe-area-bottom);
+      padding-left: var(--safe-area-left);
+      padding-right: var(--safe-area-right);
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      height: calc(var(--vh, 1vh) * 100);
+      position: relative;
+      /* 确保内容不被安全区域遮挡 */
+      margin-top: calc(-1 * var(--safe-area-top));
+      margin-bottom: calc(-1 * var(--safe-area-bottom));
+      margin-left: calc(-1 * var(--safe-area-left));
+      margin-right: calc(-1 * var(--safe-area-right));
+    }
+
+    /* 内容区域在上方 */
+    #viewer-wrap {
+      order: 1;
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toolbar .spacer { flex: 1; }
+
+    /* iOS 风格按钮 */
+    .btn, .file {
+      font: inherit;
+      color: var(--fg);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--ios-button-radius);
+      padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 16px);
+      cursor: pointer;
+      font-size: clamp(14px, 3.5vw, 16px);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      min-height: var(--ios-button-height);
+      /* iOS 风格过渡 */
+      transition: all var(--ios-transition);
+      /* iOS 风格阴影 */
+      box-shadow: var(--ios-shadow);
+      /* iOS 风格字体 */
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-weight: 500;
+    }
+
+    .btn:hover, .btn:active { 
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      transform: translateY(1px);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn.primary { 
+      background: var(--accent); 
+      color: white; 
+      border-color: var(--accent);
+    }
+
+    .label { color: var(--muted); font-size: 0.9em; }
+
+    /* 底部工具栏 - iOS 风格 */
+    .toolbar { 
+      order: 2;
+      background: rgba(245, 245, 245, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: clamp(8px, 2vw, 16px) clamp(12px, 3vw, 20px);
+      padding-bottom: calc(clamp(8px, 2vw, 16px) + var(--safe-area-bottom));
+      display: flex;
+      align-items: center;
+      gap: clamp(6px, 2vw, 12px);
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+      /* iOS 毛玻璃效果 */
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      /* 工具栏动画 */
+      transition: all var(--ios-transition);
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    #viewer {
+      flex: 1;
+      overflow: hidden;
+      padding: 0;
+      font-size: var(--content-font-size);
+      background: var(--bg);
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+      -webkit-touch-callout: default;
+      box-sizing: border-box;
+      display: block;
+      width: 100%;
+      height: 100%;
+      /* iOS 滚动优化 */
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: none;
+      touch-action: pan-x;
+    }
+
+    .hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--muted);
+      text-align: center;
+      font-size: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* EPUB内容样式 */
+    .epub-content { 
+      width: 100%;
+      height: 100%;
+    }
+
+    /* EPUB阅读器样式 */
+    .epub-container {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* 侧边栏基础样式 - iOS 风格 */
+    .sidebar {
+      position: fixed;
+      top: 0; bottom: 0;
+      background: rgba(245, 245, 245, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      transform: translateX(-100%);
+      transition: transform var(--ios-transition);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--ios-shadow);
+      /* iOS 安全区域适配 */
+      padding-top: var(--safe-area-top);
+      padding-bottom: var(--safe-area-bottom);
+    }
+
+    .sidebar.open { transform: translateX(0); }
+
+    /* TOC sidebar - iOS 风格 */
+    .toc {
+      left: 0;
+      width: clamp(280px, 80vw, 350px);
+      border-right: 1px solid var(--border);
+      z-index: 10;
+    }
+
+    .toc-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .toc-body { 
+      overflow: auto; 
+      padding: 16px; 
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .toc-empty { 
+      color: var(--muted); 
+      padding: 16px; 
+      text-align: center; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .toc-list { list-style: none; margin: 0; padding: 0; }
+    .toc-item {
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      padding: 12px 16px;
+      cursor: pointer;
+      font: inherit;
+      border-radius: var(--ios-button-radius);
+      margin-bottom: 4px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      transition: all var(--ios-transition);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .toc-item:hover { 
+      background: var(--accent); 
+      color: white;
+      transform: translateX(4px);
+    }
+
+    /* Marked word emoji-only (follow text layout, allow break before emoji) */
+    .marked-word { position: relative; display: inline; white-space: normal; }
+    .marked-word::before { content: "\2060"; }
+    .marked-word::after { content: attr(data-emoji); }
+
+    /* Marks sidebar - iOS 风格 */
+    .marks {
+      left: 0;
+      width: 320px;
+      border-right: 1px solid var(--border);
+      z-index: 11;
+    }
+
+    .marks-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .marks-body { 
+      overflow: auto; 
+      padding: 16px; 
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .marks-empty { 
+      color: var(--muted); 
+      padding: 16px; 
+      text-align: center; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .marks-list { list-style: none; margin: 0; padding: 0; }
+    .mark-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      margin-bottom: 8px;
+      border-radius: var(--ios-button-radius);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      transition: all var(--ios-transition);
+      background: var(--bg);
+      box-shadow: var(--ios-shadow);
+    }
+
+    .mark-item:hover { 
+      background: var(--accent); 
+      color: white;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .group-header { background: var(--panel); }
+    .group-header:hover { background: var(--accent); color: #fff; }
+    .mark-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: center/cover no-repeat;
+      flex-shrink: 0;
+    }
+
+    .mark-text {
+      flex: 1;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .mark-delete {
+      background: #FF3B30;
+      color: white;
+      border: none;
+      border-radius: var(--ios-button-radius);
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all var(--ios-transition);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .mark-delete:hover {
+      background: #D70015;
+      transform: scale(0.95);
+    }
+
+    .mark-count {
+      background: var(--accent);
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+      min-width: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Theme sidebar - iOS 风格 */
+    .theme-drawer {
+      left: 0;
+      width: clamp(300px, 85vw, 380px);
+      border-right: 1px solid var(--border);
+      z-index: 12;
+      padding: clamp(12px, 3vw, 16px);
+      gap: clamp(8px, 2vw, 12px);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .theme-drawer.open { transform: translateX(0); }
+    .theme-row { 
+      display: flex; 
+      gap: 12px; 
+      align-items: center; 
+      flex-wrap: wrap; 
+      margin-bottom: 16px;
+    }
+
+    .theme-row label { 
+      color: var(--muted); 
+      min-width: 80px; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-weight: 500;
+    }
+
+    .theme-row input[type="color"] { 
+      width: 44px; 
+      height: 32px; 
+      padding: 0; 
+      border: 1px solid var(--border); 
+      border-radius: var(--ios-button-radius); 
+      background: transparent; 
+    }
+
+    .theme-row input[type="range"] { 
+      width: 160px; 
+      height: 32px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--panel);
+      border-radius: 16px;
+      outline: none;
+    }
+
+    .theme-row input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      box-shadow: var(--ios-shadow);
+    }
+
+    .theme-actions { display:flex; gap: 12px; }
+    .theme-preset { display:flex; gap: 8px; }
+
+    /* Shelf sidebar - iOS 风格 */
+    .shelf {
+      left: 0;
+      width: clamp(300px, 85vw, 380px);
+      border-right: 1px solid var(--border);
+      z-index: 13;
+    }
+
+    .shelf-header { 
+      display: flex; align-items: center; gap: 12px; 
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-weight: 600;
+    }
+
+    .shelf-header .btn {
+      min-width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .shelf-actions {
+      display: flex;
+      gap: 8px;
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+      flex-wrap: wrap;
+    }
+
+    .shelf-actions .btn {
+      flex: 1;
+      min-width: 0;
+      font-size: 14px;
+      padding: 8px 12px;
+      font-weight: 500;
+    }
+
+    .shelf-body { 
+      overflow: auto; 
+      padding: 16px; 
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .shelf-empty { 
+      color: var(--muted); 
+      padding: 16px; 
+      text-align: center; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .book { 
+      display: flex;
+      flex-direction: column;
+      gap: 8px; 
+      padding: 16px; 
+      border: 1px solid var(--border);
+      border-radius: var(--ios-button-radius);
+      margin-bottom: 12px;
+      background: var(--bg);
+      transition: all var(--ios-transition);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      box-shadow: var(--ios-shadow);
+    }
+
+    .book:hover { 
+      background: var(--panel); 
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-inner { display:flex; align-items:center; gap:12px; }
+    .book-delete { display:none; margin-left:12px; }
+    .shelf.edit-mode .book-delete { display:block; }
+    .book-delete .btn { 
+      background:#FF3B30; 
+      color:#fff; 
+      border-color:#FF3B30; 
+      font-size:14px; 
+      padding:6px 12px; 
+      font-weight: 500;
+    }
+
+    .book-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .book-info {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .book-title { 
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 1.4;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: inherit;
+      word-break: break-all;
+      hyphens: auto;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .book-meta { display: none; }
+    .book-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .book-actions .btn { 
+      flex: 1; 
+      font-size: 14px; 
+      padding: 8px 12px; 
+      min-width: 0; 
+      font-weight: 500;
+    }
+
+    /* 翻页按钮特殊样式 - iOS 风格 */
+    #prevPageBtn, #nextPageBtn {
+      font-size: 20px;
+      font-weight: 600;
+      min-width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      box-shadow: var(--ios-shadow);
+      transition: all var(--ios-transition);
+    }
+
+    #prevPageBtn:hover, #nextPageBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    }
+
+    /* 侧边栏背景遮罩 - iOS 风格 */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 3;
+      opacity: 0;
+      visibility: hidden;
+      transition: all var(--ios-transition);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .sidebar-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* iOS 触摸反馈 */
+    @media (hover: none) and (pointer: coarse) {
+      .btn:active, .toc-item:active, .mark-item:active, .book:active {
+        transform: scale(0.95);
+        opacity: var(--ios-active-opacity);
+      }
+    }
+
+    /* iOS 安全区域适配 */
+    @supports (padding-top: env(safe-area-inset-top)) {
+      .sidebar {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+    }
+
+    /* iOS 状态栏适配 */
+    @supports (padding-top: env(safe-area-inset-top)) {
+      .toolbar {
+        padding-top: calc(clamp(8px, 2vw, 16px) + env(safe-area-inset-top));
+      }
+    }
+
+    /* 深色模式支持 */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #000000;
+        --fg: #ffffff;
+        --muted: #8e8e93;
+        --accent: #0A84FF;
+        --panel: #1c1c1e;
+        --border: #38383a;
+      }
+    }
+
+    /* 横屏优化 */
+    @media (orientation: landscape) {
+      .toolbar {
+        padding: 8px 16px;
+        padding-top: calc(8px + var(--safe-area-top));
+        padding-bottom: calc(8px + var(--safe-area-bottom));
+      }
+    }
+
+    /* 大屏幕优化 */
+    @media (min-width: 768px) {
+      .sidebar {
+        max-width: 400px;
+      }
+    }
+
+    /* 触摸设备优化 */
+    @media (pointer: coarse) {
+      .btn, .toc-item, .mark-item, .book {
+        min-height: 44px;
+      }
+    }
+
+    /* iOS 设备特定样式 */
+    .ios-device .btn {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .ios-device .toolbar {
+      background: rgba(245, 245, 245, 0.98);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+    }
+
+    .ios-device .sidebar {
+      background: rgba(245, 245, 245, 0.98);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+    }
+
+    .ios-device .fn-popover {
+      background: rgba(245, 245, 245, 0.98);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+    }
+
+    /* iOS 深色模式 */
+    @media (prefers-color-scheme: dark) {
+      .ios-device .toolbar {
+        background: rgba(28, 28, 30, 0.98);
+      }
+      
+      .ios-device .sidebar {
+        background: rgba(28, 28, 30, 0.98);
+      }
+      
+      .ios-device .fn-popover {
+        background: rgba(28, 28, 30, 0.98);
+      }
+    }
+
+  </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/epubjs@0.3/dist/epub.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+
+  <style>
+    /* Footnote popover - iOS 风格 */
+    .fn-popover{
+      position:fixed;
+      max-width:26rem;
+      background:rgba(245, 245, 245, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color:#111;
+      border:1px solid #e5e7eb;
+      box-shadow:0 10px 30px rgba(0,0,0,.2);
+      padding:1rem 1.2rem;
+      border-radius:12px;
+      z-index:9999;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .fn-overlay{
+      position:fixed;
+      inset:0;
+      background:transparent;
+      z-index:9998
+    }
+    @media (prefers-color-scheme: dark){
+      .fn-popover{
+        background:rgba(28, 28, 30, 0.95);
+        color:#ffffff;
+        border-color:#38383a
+      }
+    }
+
+    /* iOS 滚动条样式 */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    /* 深色模式滚动条 */
+    @media (prefers-color-scheme: dark) {
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+
+  </style>
+
+</head>
+<body>
+  <div class="app">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="toolbar">
+      <button class="btn" id="toggleToc">目录</button>
+      <button class="btn" id="markBtn">标记</button>
+      <button class="btn" id="toggleMarks">标记列表</button>
+      <input id="markImage" type="file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp,image/*" style="display:none" />
+      <button class="btn" id="toggleTheme">主题</button>
+      <button class="btn" id="toggleShelf">书柜</button>
+      
+      <span class="spacer"></span>
+      
+      <button class="btn" id="prevPageBtn" title="上一页">‹</button>
+      <button class="btn" id="nextPageBtn" title="下一页">›</button>
+    </div>
+
+    <div id="viewer-wrap">
+      <div class="sidebar toc" id="toc">
+        <div class="toc-header">
+          <span>目录</span>
+          <button class="btn" id="closeToc" title="关闭">×</button>
+        </div>
+        <div class="toc-body">
+          <ul class="toc-list" id="toc-list"></ul>
+          <div class="toc-empty" id="toc-empty" style="display:none">无目录</div>
+        </div>
+      </div>
+
+      <div class="sidebar marks" id="marks">
+        <div class="marks-header">
+          <span>标记列表</span>
+          <button class="btn" id="closeMarks" title="关闭">×</button>
+        </div>
+        <div class="marks-body">
+          <div class="marks-empty" id="marks-empty" style="display:none">无标记</div>
+          <div id="marks-list"></div>
+        </div>
+      </div>
+
+      <div class="sidebar theme-drawer" id="themeDrawer">
+        <div class="theme-row"><strong style="flex:1">主题设置</strong><button class="btn" id="closeTheme" title="关闭">×</button></div>
+        <div class="theme-row">
+          <label>字体大小</label>
+          <input type="range" id="themeFont" min="12" max="22" step="1">
+          <label>内容行距</label>
+          <input type="range" id="themeLine" min="1.2" max="2.0" step="0.05">
+        </div>
+
+        <div class="theme-row theme-actions">
+          <div class="theme-preset">
+            <button class="btn" id="presetLight">亮</button>
+            <button class="btn" id="presetDark">暗</button>
+            <button class="btn" id="presetSepia">仿古</button>
+          </div>
+          <button class="btn" id="themeReset">重置</button>
+        </div>
+      </div>
+
+      <div class="sidebar shelf" id="shelf">
+        <div class="shelf-header">
+          <strong style="flex:1">书柜</strong>
+          <button class="btn" id="closeShelf" title="关闭">×</button>
+        </div>
+        <div class="shelf-actions">
+          <button class="btn" id="shelfEdit">编辑</button>
+          <button class="btn" id="addCurrent">添加当前</button>
+          <button class="btn" id="addFromDisk">添加文件</button>
+          <input id="shelfAddInput" type="file" accept=".epub" style="display:none" />
+          <input id="shelfLinkInput" type="file" accept=".epub" style="display:none" />
+        </div>
+        <div class="shelf-body">
+          <div class="shelf-empty" id="shelf-empty">书柜为空</div>
+          <div id="shelf-list"></div>
+        </div>
+      </div>
+
+      <div id="viewer">
+        <div class="hint">拖拽 EPUB 文件到此处，或从书柜中选择文件</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      // iOS 初始化设置
+      function initIOSOptimizations() {
+        // 设置动态视口高度
+        function setVH() {
+          const vh = window.innerHeight * 0.01;
+          document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        // 监听视口变化
+        window.addEventListener('resize', setVH);
+        window.addEventListener('orientationchange', () => {
+          setTimeout(setVH, 100);
+        });
+        
+        // 初始化设置
+        setVH();
+        
+        // 禁用双击缩放
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+          const now = (new Date()).getTime();
+          if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+          }
+          lastTouchEnd = now;
+        }, false);
+        
+        // 禁用长按选择
+        document.addEventListener('selectstart', (e) => {
+          if (!e.target.closest('#viewer')) {
+            e.preventDefault();
+          }
+        });
+        
+        // 检测iOS设备
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        
+        if (isIOS) {
+          document.body.classList.add('ios-device');
+          // iOS 特定优化
+          document.documentElement.style.setProperty('--accent', '#007AFF');
+          document.documentElement.style.setProperty('--radius', '8px');
+        }
+      }
+      
+      // 初始化iOS优化
+      initIOSOptimizations();
+      
+      // 处理URL参数（支持PWA快捷方式）
+      function handleURLParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action');
+        
+        if (action === 'shelf') {
+          // 延迟执行，确保DOM已加载
+          setTimeout(() => {
+            openShelf();
+          }, 100);
+        }
+      }
+      
+      // 处理URL参数
+      handleURLParams();
+      
+      const $ = (sel) => document.querySelector(sel);
+
+      const btnSmaller = null;
+      const btnLarger = null;
+      const btnToc = $('#toggleToc');
+      const btnCloseToc = $('#closeToc');
+      const btnMark = $('#markBtn');
+      const btnMarks = $('#toggleMarks');
+      const marksEl = $('#marks');
+      const btnCloseMarks = $('#closeMarks');
+      const marksList = $('#marks-list');
+      const marksEmpty = $('#marks-empty');
+      const markImageInput = $('#markImage');
+      const btnShelf = $('#toggleShelf');
+      const shelfEl = $('#shelf');
+      const btnAddCurrent = $('#addCurrent');
+
+      const btnAddFromDisk = $('#addFromDisk');
+      const btnCloseShelf = $('#closeShelf');
+      const shelfAddInput = $('#shelfAddInput');
+      const shelfLinkInput = $('#shelfLinkInput');
+      const shelfList = $('#shelf-list');
+      const shelfEmpty = $('#shelf-empty');
+      const btnShelfEdit = $('#shelfEdit');
+      let shelfEditMode = false;
+
+      const viewer = $('#viewer');
+      const viewerWrap = $('#viewer-wrap');
+      const tocEl = $('#toc');
+      const tocList = $('#toc-list');
+      const tocEmpty = $('#toc-empty');
+      const btnShowUI = null;
+      const btnToggleUI = null;
+
+      /** State */
+      let currentFile = null; // File
+      let currentFormat = 'none'; // 'epub' | 'text' | 'md' | 'html' | 'none'
+      let book = null; // ePub.js Book
+      let rendition = null; // ePub.js Rendition
+      let fontScale = 1.0; // 1.0 => root font-size
+      let currentIframe = null; // for HTML
+      // Paged layout state
+      let originalTextContent = '';
+      let originalMarkdownHtml = '';
+      let restoredPageForCurrentFile = false; // 是否已恢复分页位置
+      // EPUB 脚注索引缓存（id -> HTML）
+      let epubFootnoteIndex = null; // by target id (e.g., bz1)
+      let epubFootnoteBackrefIndex = null; // by backref id (e.g., z1)
+      // EPUB 脚注按需缓存（文件路径 -> { htmlMap: id->html, ts }）
+      const footnotePageCache = new Map();
+      const FOOTNOTE_CACHE_MAX = 3;
+      function cachePutFootnotePage(path, htmlMap){
+        if (!path || !htmlMap) return;
+        if (footnotePageCache.has(path)) footnotePageCache.delete(path);
+        footnotePageCache.set(path, { htmlMap, ts: Date.now() });
+        while (footnotePageCache.size > FOOTNOTE_CACHE_MAX) {
+          let oldestKey = null, oldestTs = Infinity;
+          for (const [k,v] of footnotePageCache.entries()) { if ((v.ts||0) < oldestTs) { oldestTs=v.ts; oldestKey=k; } }
+          if (oldestKey) footnotePageCache.delete(oldestKey); else break;
+        }
+      }
+      function cacheGetFootnote(path){
+        const hit = footnotePageCache.get(path);
+        if (hit) { hit.ts = Date.now(); return hit.htmlMap; }
+        return null;
+      }
+      async function parseFootnotePageIntoMap(epubPath){
+        // 返回 { id -> html }
+        const result = {};
+        let text = '';
+        try { text = await (book.request ? book.request(epubPath) : ''); } catch {}
+        if (!text) { try { const res = book.resources && book.resources.get ? book.resources.get(epubPath) : null; if (res && res.getText) text = await res.getText(); else if (res && res.text) text = await res.text(); else if (res && res.load) { const buf = await res.load(null); text = new TextDecoder('utf-8').decode(buf); } } catch {} }
+        if (!text) { try { const f = book.archive && book.archive.zip && book.archive.zip.file ? book.archive.zip.file(epubPath) : null; if (f) text = await f.async('string'); } catch {} }
+        if (!text && book.archive && book.archive.request) { try { text = await book.archive.request(epubPath, 'text'); } catch {} }
+        if (!text) return result;
+        let dom = null; try { dom = new DOMParser().parseFromString(text, 'text/html'); } catch {}
+        if (!dom) return result;
+        const nodes = dom.querySelectorAll('p.zhusi, p.note, li[id^="fn"], aside[epub\\:type~="footnote"], aside[role~="doc-endnote"], ol.footnotes li');
+        for (const el of nodes) {
+          const a = el.querySelector('a[id], a[name]');
+          const id = (a && (a.id || a.getAttribute('name'))) || el.id;
+          if (!id) continue;
+          if (!result[id]) result[id] = el.innerHTML || el.textContent || '';
+          try { const back = el.querySelector('a[href*="#"]'); const h = back && back.getAttribute('href'); if (h && h.includes('#')) { const backId = h.slice(h.indexOf('#')+1); if (backId && !result[backId]) result[backId] = el.innerHTML || el.textContent || ''; } } catch {}
+        }
+        return result;
+      }
+
+      const setStatus = (text) => {
+        if (text) console.log(text);
+      };
+      const keyFor = (file, suffix) => `reader:${file.name}:${file.size}:${suffix}`;
+
+      // ========== Footnote Popover Utilities ==========
+      function closeFootnotePopover(){
+        try { document.getElementById('fn-popover')?.remove(); } catch {}
+        try { document.getElementById('fn-overlay')?.remove(); } catch {}
+      }
+      function openFootnotePopover(html, anchorRect){
+        closeFootnotePopover();
+        try {
+          const overlay = document.createElement('button');
+          overlay.id = 'fn-overlay'; overlay.className = 'fn-overlay'; overlay.setAttribute('aria-label','Close footnote');
+          overlay.addEventListener('click', closeFootnotePopover);
+          document.body.appendChild(overlay);
+
+          const pop = document.createElement('div');
+          pop.id = 'fn-popover'; pop.className = 'fn-popover';
+          pop.innerHTML = html && String(html).trim() ? html : '<div style="color:#888">无可显示的注脚内容</div>';
+          document.body.appendChild(pop);
+
+          const rect = pop.getBoundingClientRect();
+          const centerX = anchorRect.left + anchorRect.width/2;
+          let left = Math.min(Math.max(8, centerX - rect.width/2), window.innerWidth - rect.width - 8);
+          let top = anchorRect.bottom + 12;
+          if (top + rect.height > window.innerHeight - 8) top = anchorRect.top - rect.height - 12;
+          pop.style.left = left + 'px';
+          pop.style.top = top + 'px';
+        } catch {}
+      }
+      window.__openFootnotePopover = openFootnotePopover;
+      window.__closeFootnotePopover = closeFootnotePopover;
+      window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeFootnotePopover(); });
+
+      function cssEscapeCompat(str){
+        if (window.CSS && CSS.escape) return CSS.escape(str);
+        return String(str).replace(/[^a-zA-Z0-9_\-]/g, (c)=>'\\'+c.charCodeAt(0).toString(16)+' ');
+      }
+      function lookupHashTarget(rootDoc, hash){
+        const raw = String(hash||'');
+        const id = raw.startsWith('#') ? raw.slice(1) : raw;
+        const decoded = decodeURIComponent(id);
+        let el = null;
+        try { el = rootDoc.getElementById(decoded); } catch {}
+        if (!el) { try { el = rootDoc.querySelector('[id="'+cssEscapeCompat(decoded)+'"]'); } catch {} }
+        if (!el) { try { el = rootDoc.querySelector('[name="'+cssEscapeCompat(decoded)+'"]'); } catch {} }
+        return el;
+      }
+      function isInsideFootnoteArea(node){
+        try {
+          return !!(node && node.closest && node.closest('.zhusi, .note, .footnote, .footnotes, ol.footnotes, aside[epub\\:type~="footnote"], aside[role~="doc-endnote"], section[role~="doc-endnotes"], nav.toc, .toc'));
+        } catch { return false; }
+      }
+      function extractFootnoteHtml(rootDoc, target){
+        try {
+          if (!target) return '';
+          // 如果目标有实际内容
+          const raw = (target.innerHTML && target.innerHTML.trim()) ? target.innerHTML : (target.textContent||'');
+          if (raw && String(raw).trim()) return raw;
+          // 目标为空锚点时，向上寻找容器
+          let container = null;
+          try { container = target.closest && target.closest('.zhusi, .note, .footnote, .footnotes, p, li, div'); } catch {}
+          if (!container) container = target.parentElement;
+          if (container) {
+            const html = (container.innerHTML && container.innerHTML.trim()) ? container.innerHTML : (container.textContent||'');
+            if (html && String(html).trim()) return html;
+          }
+          // 尝试查找以该锚点为子元素的段落
+          try {
+            const id = target.id || target.getAttribute('name') || '';
+            if (id) {
+              const p = rootDoc.querySelector('p.zhusi a#'+cssEscapeCompat(id)+', p.note a#'+cssEscapeCompat(id)+', p a#'+cssEscapeCompat(id));
+              if (p && p.closest) {
+                const cont = p.closest('p.zhusi, p, li, div');
+                if (cont) {
+                  const html2 = (cont.innerHTML && cont.innerHTML.trim()) ? cont.innerHTML : (cont.textContent||'');
+                  if (html2 && String(html2).trim()) return html2;
+                }
+              }
+            }
+          } catch {}
+        } catch {}
+        return '';
+      }
+
+      function resolveEpubPath(baseHref, relative){
+        const rel = String(relative||'');
+        if (!baseHref) return rel;
+        const base = String(baseHref||'');
+        const baseDir = base.replace(/[^\/]*$/, '');
+        if (/^\/?[A-Za-z]:\\/.test(rel)) return rel; // windows path (unlikely)
+        if (/^\/?(OEBPS|Text|OPS|EPUB)\//i.test(rel)) return rel.replace(/^\//,'');
+        if (rel.includes('/')) {
+          // already a relative path, join
+          return (baseDir + rel).replace(/\/+/g,'/');
+        }
+        return (baseDir + rel).replace(/\/+/g,'/');
+      }
+
+      function normalizePath(p){
+        return String(p||'').replace(/\\+/g,'/').replace(/^\.?\//,'');
+      }
+
+      function findBestResourcePath(path){
+        try {
+          const p = normalizePath(path);
+          const candidates = [p, 'OEBPS/'+p, 'OPS/'+p, 'EPUB/'+p, 'Text/'+p, 'OEBPS/Text/'+p];
+          const seen = new Set();
+          const push = (x)=>{ const n=normalizePath(x); if (!seen.has(n)) { candidates.push(n); seen.add(n); } };
+          // 资源清单
+          let resourceKeys = [];
+          try {
+            if (book && book.resources && book.resources.resources) {
+              resourceKeys = Object.keys(book.resources.resources).map(normalizePath);
+            }
+          } catch {}
+          try {
+            if ((!resourceKeys || resourceKeys.length===0) && book && book.archive && book.archive.zip && book.archive.zip.files) {
+              resourceKeys = Object.keys(book.archive.zip.files).map(normalizePath);
+            }
+          } catch {}
+          // 追加从 keys 推断的前缀
+          for (const k of resourceKeys) {
+            if (/\/(Text|OEBPS|OPS|EPUB)\//i.test(k)) {
+              const dir = k.replace(/[^\/]*$/, '');
+              push(dir + p);
+            }
+          }
+          // 精确匹配
+          for (const c of candidates) { if (resourceKeys.includes(c)) return c; }
+          // 后缀匹配
+          for (const c of candidates) {
+            const found = resourceKeys.find(k => k.endsWith('/'+c) || k.endsWith(c));
+            if (found) return found;
+          }
+          // 最后回退第一个候选
+          return candidates[0];
+        } catch { return String(path||''); }
+      }
+
+      async function fetchAndExtractFragment(hrefRaw, rootDoc, baseHref){
+        try {
+          const s = String(hrefRaw||'');
+          const idx = s.indexOf('#');
+          const path = idx >= 0 ? s.slice(0, idx) : s;
+          const frag = idx >= 0 ? s.slice(idx) : '';
+          if (!path || !frag) return '';
+          try { const id = frag.replace(/^#/, ''); if (epubFootnoteIndex && epubFootnoteIndex[id]) return epubFootnoteIndex[id]; if (epubFootnoteBackrefIndex && epubFootnoteBackrefIndex[id]) return epubFootnoteBackrefIndex[id]; } catch {}
+          if (currentFormat === 'epub' && typeof book === 'object' && book) {
+            try {
+              const joined = resolveEpubPath(baseHref || '', path);
+              const epubPath = findBestResourcePath(joined);
+              let text = '';
+              try { text = await (book.request ? book.request(epubPath) : ''); } catch {}
+              if (!text) { try { const res = book.resources && book.resources.get ? book.resources.get(epubPath) : null; if (res && res.getText) text = await res.getText(); else if (res && res.text) text = await res.text(); else if (res && res.load) { const buf = await res.load(null); text = new TextDecoder('utf-8').decode(buf); } } catch {} }
+              if (!text) { try { const f = book.archive && book.archive.zip && book.archive.zip.file ? book.archive.zip.file(epubPath) : null; if (f) text = await f.async('string'); } catch {} }
+              if (!text && book.archive && book.archive.request) { try { text = await book.archive.request(epubPath, 'text'); } catch {} }
+              if (text) { const dom = new DOMParser().parseFromString(text, 'text/html'); const target = lookupHashTarget(dom, frag); if (target) return extractFootnoteHtml(dom, target); }
+            } catch {}
+            return '';
+          }
+          return '';
+        } catch { return ''; }
+      }
+
+      function openFootnotePopoverWithIframe(url, anchorRect){
+        closeFootnotePopover();
+        try {
+          const overlay = document.createElement('button');
+          overlay.id = 'fn-overlay'; overlay.className = 'fn-overlay'; overlay.setAttribute('aria-label','Close footnote');
+          overlay.addEventListener('click', closeFootnotePopover);
+          document.body.appendChild(overlay);
+
+          const pop = document.createElement('div');
+          pop.id = 'fn-popover'; pop.className = 'fn-popover';
+          const frame = document.createElement('iframe');
+          frame.style.border = '0'; frame.style.width = '100%'; frame.style.height = '260px';
+          frame.src = url; // 包含 #fragment 的 URL，会在 iframe 内部自动定位
+          pop.appendChild(frame);
+          // 若同源，尝试自动裁剪到目标片段附近
+          frame.addEventListener('load', () => {
+            try {
+              const doc = frame.contentDocument;
+              const hash = (new URL(url, doc.location.href)).hash;
+              if (hash) {
+                const target = doc.querySelector(hash);
+                if (target) target.scrollIntoView({block:'start'});
+              }
+            } catch {}
+          });
+          document.body.appendChild(pop);
+
+          const rect = pop.getBoundingClientRect();
+          const centerX = anchorRect.left + anchorRect.width/2;
+          let left = Math.min(Math.max(8, centerX - rect.width/2), window.innerWidth - rect.width - 8);
+          let top = anchorRect.bottom + 12;
+          if (top + rect.height > window.innerHeight - 8) top = anchorRect.top - rect.height - 12;
+          pop.style.left = left + 'px';
+          pop.style.top = top + 'px';
+        } catch {}
+      }
+
+      async function handleFootnoteClick(anchor, rootDoc, pageRect, baseHref){
+        try {
+          const href = anchor.getAttribute('href') || '';
+          const rect = anchor.getBoundingClientRect();
+          const anchorRect = pageRect || rect;
+          if (href.startsWith('#')) {
+            const target = lookupHashTarget(rootDoc, href);
+            if (!target) return false;
+            const html = extractFootnoteHtml(rootDoc, target);
+            openFootnotePopover(html, anchorRect);
+            return true;
+          }
+          // 跨文档：相对/绝对路径 + #fragment
+          if (href.includes('#')) {
+            // 先尝试同文档内查找 fragment（适配 doc.write 的 HTML 场景）
+            const idx = href.indexOf('#');
+            const frag = href.slice(idx);
+            const within = lookupHashTarget(rootDoc, frag);
+            if (within) {
+              const html2 = extractFootnoteHtml(rootDoc, within);
+              openFootnotePopover(html2, anchorRect);
+              return true;
+            }
+            // 进一步尝试：依据正文处的回跳锚点（如 <a id="w2">），在注释区查找 a[href$="#w2"]
+            try {
+              const siblingAnchor = (anchor.previousElementSibling && anchor.previousElementSibling.tagName === 'A' && (anchor.previousElementSibling.id || anchor.previousElementSibling.getAttribute('name'))) ? (anchor.previousElementSibling.id || anchor.previousElementSibling.getAttribute('name')) : '';
+              if (siblingAnchor) {
+                // 若预构建索引已包含回跳映射，直接使用
+                if (epubFootnoteBackrefIndex && epubFootnoteBackrefIndex[siblingAnchor]) {
+                  openFootnotePopover(epubFootnoteBackrefIndex[siblingAnchor], anchorRect);
+                  return true;
+                }
+                const backRef = rootDoc.querySelector('a[href$="#'+cssEscapeCompat(siblingAnchor)+'"]');
+                if (backRef) {
+                  const container = (backRef.closest && backRef.closest('.note, .footnote, p, li, div')) || backRef.parentElement;
+                  if (container) {
+                    const html3 = (container.innerHTML && container.innerHTML.trim()) ? container.innerHTML : (container.textContent||'');
+                    if (html3 && String(html3).trim()) {
+                      openFootnotePopover(html3, anchorRect);
+                      return true;
+                    }
+                  }
+                }
+              }
+            } catch {}
+            // 否则使用浏览器解析后的绝对地址（EPUB blob: 或可访问路径）
+            // 先尝试直接抓取并解析目标文件片段（避免移动端 iframe 404）
+            try {
+              const html = await fetchAndExtractFragment(href, rootDoc, baseHref || '');
+              if (html && String(html).trim()) { openFootnotePopover(html, anchorRect); return true; }
+            } catch {}
+            // 如果 EPUB 内部读取失败，尝试用 iframe 方案
+            // 但需要确保 iframe 指向正确的 blob URL
+            try {
+              let abs = anchor.href || href;
+              // 如果是相对路径，尝试从当前 EPUB 内容页的 blob URL 解析
+              if (!abs.startsWith('blob:') && !abs.startsWith('http')) {
+                const currentBlob = rootDoc.location && rootDoc.location.href;
+                if (currentBlob && currentBlob.startsWith('blob:')) {
+                  // 从当前 blob URL 推断目标 blob URL
+                  const baseDir = currentBlob.replace(/[^\/]*$/, '');
+                  abs = baseDir + path;
+                }
+              }
+              openFootnotePopoverWithIframe(abs, anchorRect);
+              return true;
+            } catch {
+              // 最后的兜底：显示错误信息
+              openFootnotePopover('<div style="color:#888">无法加载脚注内容</div>', anchorRect);
+              return true;
+            }
+          }
+          return false;
+        } catch { return false; }
+      }
+
+      // 委托：MD/TXT 视图在主文档内，直接拦截 viewer 内部的锚点
+      try {
+        viewer.addEventListener('click', (ev) => {
+          if (!(currentFormat === 'md' || currentFormat === 'text')) return;
+          const a = ev.target && (ev.target.closest && ev.target.closest('a'));
+          if (!a || !isFootnoteLink(a)) return;
+          const href = a.getAttribute('href') || '';
+          if (!href.startsWith('#')) return;
+          const target = viewer.querySelector(href);
+          if (!target) return;
+          ev.preventDefault(); ev.stopPropagation();
+          openFootnotePopover(target.innerHTML, a.getBoundingClientRect());
+        }, true);
+      } catch {}
+
+      function setLastOpenedBookId(id) {
+        try { localStorage.setItem('reader:lastBookId', String(id || '')); } catch {}
+      }
+      async function restoreLastBook() {
+        try {
+          const id = localStorage.getItem('reader:lastBookId');
+          if (!id) return;
+          const bk = await idbGetBook(id);
+          if (!bk) return;
+          if (bk.hasBlob && bk.blob) {
+            await openBookFromShelf(bk);
+          } else {
+            // 无缓存时不自动弹文件选择，静默跳过
+          }
+        } catch (e) {
+          console.warn('恢复上次阅读失败', e);
+        }
+      }
+
+      async function ensureJSZip() {
+        if (window.JSZip) return;
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+          s.onload = resolve;
+          s.onerror = () => reject(new Error('JSZip 加载失败'));
+          document.head.appendChild(s);
+        });
+      }
+
+      async function ensureEpubFootnoteIndex() {
+        // 预扫描改为懒加载，保持兼容接口但不做重工作
+        return;
+      }
+
+      function closeAllSidebars(except) {
+        if (except !== 'toc') tocEl.classList.remove('open');
+        if (except !== 'marks') marksEl.classList.remove('open');
+        if (except !== 'shelf') shelfEl.classList.remove('open');
+        const themeDrawer = document.querySelector('#themeDrawer');
+        if (except !== 'theme' && themeDrawer) themeDrawer.classList.remove('open');
+      }
+      function openToc() { closeAllSidebars('toc'); tocEl.classList.add('open'); }
+      function closeToc() { tocEl.classList.remove('open'); }
+      function resetToc() { tocList.innerHTML = ''; tocEmpty.style.display = 'none'; }
+      function showTocEmpty(msg) { tocList.innerHTML = ''; tocEmpty.textContent = msg || '无目录'; tocEmpty.style.display = 'block'; }
+
+      // 标记列表管理
+      function openMarks() { closeAllSidebars('marks'); marksEl.classList.add('open'); renderMarksList(); }
+      function closeMarks() { marksEl.classList.remove('open'); }
+      
+      function renderMarksList() {
+        const emojiMarks = loadEmojiMarks();
+        const collapsed = loadCollapsedGroups();
+        marksList.innerHTML = '';
+        const emojis = Object.keys(emojiMarks);
+        if (!emojis.length) { marksEmpty.style.display = 'block'; return; }
+        marksEmpty.style.display = 'none';
+        // 按 emoji 分组渲染（可折叠）
+        for (const emoji of emojis) {
+          const group = document.createElement('div');
+          group.className = 'mark-group';
+          const header = document.createElement('div');
+          header.className = 'mark-item group-header';
+          header.style.fontWeight = 'bold';
+          header.style.userSelect = 'none';
+          const arrow = document.createElement('span');
+          arrow.textContent = collapsed[emoji] ? '▸' : '▾';
+          arrow.style.marginRight = '6px';
+          const title = document.createElement('span');
+          title.textContent = `标记：${emoji}`;
+          header.appendChild(arrow);
+          header.appendChild(title);
+          // 数量徽标：词条数量；悬浮提示包含总出现次数
+          const terms = emojiMarks[emoji] || [];
+          const termCount = terms.length;
+          let totalOcc = 0;
+          try { totalOcc = terms.reduce((sum, t) => sum + countMarkOccurrences(t), 0); } catch {}
+          const headerBadge = document.createElement('div');
+          headerBadge.className = 'mark-count';
+          headerBadge.textContent = totalOcc;
+          headerBadge.title = `${totalOcc}处标记（${termCount}个词）`;
+          header.appendChild(headerBadge);
+          group.appendChild(header);
+          const body = document.createElement('div');
+          body.className = 'mark-group-body';
+          body.style.display = collapsed[emoji] ? 'none' : 'block';
+          for (const term of emojiMarks[emoji] || []) {
+            const item = document.createElement('div');
+            item.className = 'mark-item';
+            const text = document.createElement('div');
+            text.className = 'mark-text';
+            text.textContent = term;
+            const count = countMarkOccurrences(term);
+            const countBadge = document.createElement('div');
+            countBadge.className = 'mark-count';
+            countBadge.textContent = count;
+            countBadge.title = `${count}处标记`;
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'mark-delete';
+            deleteBtn.textContent = '删除';
+            deleteBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (confirm(`确定删除标记 ${emoji} 下的"${term}"？`)) {
+                removeTermFromEmoji(term, emoji);
+                removeMarksEverywhere(term);
+                renderMarksList();
+                setStatus(`已删除：${emoji} → ${term}`);
+              }
+            });
+            item.appendChild(text);
+            item.appendChild(countBadge);
+            item.appendChild(deleteBtn);
+            body.appendChild(item);
+          }
+          header.addEventListener('click', () => {
+            const isCollapsed = body.style.display !== 'block';
+            if (isCollapsed) {
+              body.style.display = 'block';
+              arrow.textContent = '▾';
+              delete collapsed[emoji];
+            } else {
+              body.style.display = 'none';
+              arrow.textContent = '▸';
+              collapsed[emoji] = true;
+            }
+            saveCollapsedGroups(collapsed);
+          });
+          group.appendChild(body);
+          marksList.appendChild(group);
+        }
+      }
+
+      // ---- Mark storage (B: emoji -> terms) ----
+      function loadEmojiMarks() {
+        try { return JSON.parse(localStorage.getItem('reader:emojiMarks') || '{}'); } catch { return {}; }
+      }
+      function saveEmojiMarks(m) {
+        localStorage.setItem('reader:emojiMarks', JSON.stringify(m));
+      }
+      function loadCollapsedGroups() {
+        try { return JSON.parse(localStorage.getItem('reader:emojiCollapsed') || '{}'); } catch { return {}; }
+      }
+      function saveCollapsedGroups(m) {
+        localStorage.setItem('reader:emojiCollapsed', JSON.stringify(m || {}));
+      }
+      function migrateOldMarksIfAny() {
+        // 把旧的 reader:marks (term -> 'emoji:⭐️') 迁移到 emojiMarks
+        let migrated = false;
+        let emojiMarks = loadEmojiMarks();
+        try {
+          const old = JSON.parse(localStorage.getItem('reader:marks') || '{}');
+          if (old && typeof old === 'object') {
+            for (const term of Object.keys(old)) {
+              const v = old[term];
+              if (typeof v === 'string' && v.startsWith('emoji:')) {
+                const emoji = v.slice(6) || '⭐️';
+                if (!emojiMarks[emoji]) emojiMarks[emoji] = [];
+                if (!emojiMarks[emoji].includes(term)) emojiMarks[emoji].push(term);
+                migrated = true;
+              }
+            }
+          }
+        } catch {}
+        if (migrated) {
+          saveEmojiMarks(emojiMarks);
+          try { localStorage.removeItem('reader:marks'); } catch {}
+        }
+      }
+      function addTermToEmoji(term, emoji) {
+        const m = loadEmojiMarks();
+        const e = emoji || '⭐️';
+        if (!m[e]) m[e] = [];
+        if (!m[e].includes(term)) m[e].push(term);
+        saveEmojiMarks(m);
+      }
+      function removeTermFromEmoji(term, emoji) {
+        const m = loadEmojiMarks();
+        if (!m[emoji]) return;
+        m[emoji] = m[emoji].filter(t => t !== term);
+        if (m[emoji].length === 0) delete m[emoji];
+        saveEmojiMarks(m);
+      }
+      function buildTermToEmojiMap() {
+        const m = loadEmojiMarks();
+        const map = {};
+        for (const emoji of Object.keys(m)) {
+          for (const term of m[emoji] || []) {
+            map[term] = emoji;
+          }
+        }
+        return map;
+      }
+
+      function defaultAvatarDataUrl() { return ''; }
+
+
+
+      function ensureMarkStyles(doc) {
+        if (!doc || !doc.head) return;
+        if (doc.getElementById('mark-styles')) return;
+        const style = doc.createElement('style');
+        style.id = 'mark-styles';
+        style.textContent = `.marked-word{position:relative;display:inline;white-space:normal;} .marked-word::before{content:"\\2060";} .marked-word::after{content:attr(data-emoji);}`;
+        doc.head.appendChild(style);
+      }
+
+      function escapeRegExp(s) { return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+      function wrapAllTermsInTextNode(node, terms, termToEmoji) {
+        const text = node.nodeValue;
+        if (!text || !terms || !terms.length) return null;
+        const doc = node.ownerDocument;
+        // 为避免子串抢占，按长度降序构造正则
+        const sorted = terms.slice().sort((a,b) => b.length - a.length);
+        const pattern = sorted.map(escapeRegExp).join('|');
+        if (!pattern) return null;
+        const re = new RegExp(pattern, 'g');
+        let match;
+        let lastIndex = 0;
+        let hasAny = false;
+        const frag = doc.createDocumentFragment();
+        while ((match = re.exec(text)) !== null) {
+          const idx = match.index;
+          const term = match[0];
+          if (idx > lastIndex) {
+            frag.appendChild(doc.createTextNode(text.slice(lastIndex, idx)));
+          }
+          const span = doc.createElement('span');
+          span.className = 'marked-word';
+          span.setAttribute('data-term', term);
+          const emoji = termToEmoji[term] || '⭐️';
+          span.setAttribute('data-emoji', emoji);
+          span.style.display = 'inline';
+          span.appendChild(doc.createTextNode(term));
+          frag.appendChild(span);
+          lastIndex = idx + term.length;
+          hasAny = true;
+        }
+        if (!hasAny) return null;
+        if (lastIndex < text.length) {
+          frag.appendChild(doc.createTextNode(text.slice(lastIndex)));
+        }
+        return frag;
+      }
+
+      function applyMarksToDocument(doc) {
+        if (!doc) return;
+        ensureMarkStyles(doc);
+        // 使用 emoji -> terms，并展开为 term -> emoji
+        const termToEmoji = buildTermToEmojiMap();
+        const terms = Object.keys(termToEmoji).filter(Boolean);
+        if (!terms.length) return;
+        
+        // 先移除所有现有标记
+        terms.forEach(term => {
+          removeMarksForTerm(doc, term);
+        });
+        
+        const walker = doc.createTreeWalker(doc.body || doc, NodeFilter.SHOW_TEXT, {
+          acceptNode(n) {
+            if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+            const p = n.parentElement;
+            if (p && p.closest && p.closest('.marked-word')) return NodeFilter.FILTER_REJECT;
+            if (p && (p.tagName === 'SCRIPT' || p.tagName === 'STYLE')) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        });
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        nodes.forEach((textNode) => {
+          const frag = wrapAllTermsInTextNode(textNode, terms, termToEmoji);
+          if (frag) {
+            textNode.parentNode.replaceChild(frag, textNode);
+          }
+        });
+      }
+
+      function removeMarksForTerm(doc, term) {
+        if (!doc) return;
+        const spans = doc.querySelectorAll(`.marked-word[data-term="${CSS.escape(term)}"]`);
+        spans.forEach((span) => {
+          const text = doc.createTextNode(span.textContent || '');
+          if (span.parentNode) {
+            span.parentNode.replaceChild(text, span);
+          }
+        });
+      }
+
+      function applyMarksEverywhere() {
+        if (currentFormat === 'epub' && rendition) {
+          try { rendition.getContents().forEach(c => applyMarksToDocument(c.document)); } catch {}
+        }
+        if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+          applyMarksToDocument(currentIframe.contentDocument);
+        }
+        if (currentFormat === 'md' || currentFormat === 'text') {
+          applyMarksToDocument(document);
+        }
+      }
+
+      function removeMarksEverywhere(term) {
+        if (currentFormat === 'epub' && rendition) {
+          try { rendition.getContents().forEach(c => removeMarksForTerm(c.document, term)); } catch {}
+        }
+        if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+          removeMarksForTerm(currentIframe.contentDocument, term);
+        }
+        if (currentFormat === 'md' || currentFormat === 'text') {
+          removeMarksForTerm(document, term);
+        }
+      }
+
+      // ---- Shelf (IndexedDB) ----
+      const DB_NAME = 'reader-shelf';
+      const DB_VERSION = 2;
+      const STORE = 'books';
+      const ASSET_STORE = 'assets';
+      const MAX_CACHE_BYTES = 15 * 1024 * 1024; // 15MB
+      
+
+      function idbOpen() {
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains(STORE)) {
+              const os = db.createObjectStore(STORE, { keyPath: 'id' });
+              os.createIndex('by_added', 'addedAt');
+              os.createIndex('by_lastOpened', 'lastOpened');
+            }
+            if (!db.objectStoreNames.contains(ASSET_STORE)) {
+              db.createObjectStore(ASSET_STORE, { keyPath: 'id' });
+            }
+            // 预置字体资产表结构沿用 ASSET_STORE
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      async function idbPutBook(book) {
+        const db = await idbOpen();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, 'readwrite');
+          tx.objectStore(STORE).put(book);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+
+      async function idbGetAllBooks() {
+        const db = await idbOpen();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, 'readonly');
+          const req = tx.objectStore(STORE).getAll();
+          req.onsuccess = () => resolve(req.result || []);
+          req.onerror = () => reject(req.error);
+        });
+      }
+
+      async function idbGetBook(id) {
+        const db = await idbOpen();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, 'readonly');
+          const req = tx.objectStore(STORE).get(id);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => reject(req.error);
+        });
+      }
+      
+
+      async function idbDeleteBook(id) {
+        const db = await idbOpen();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE, 'readwrite');
+          tx.objectStore(STORE).delete(id);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+
+      function humanSize(bytes) {
+        const units = ['B','KB','MB','GB'];
+        let v = bytes; let i = 0;
+        while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+        return `${v.toFixed(v >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
+      }
+
+      function detectFormatByName(name) {
+        const n = name.toLowerCase();
+        if (n.endsWith('.epub')) return 'epub';
+        return 'epub'; // 只支持EPUB格式
+      }
+
+      function formatBookName(name, maxLength = 50) {
+        if (name.length <= maxLength) return name;
+        
+        // 尝试保留扩展名
+        const lastDotIndex = name.lastIndexOf('.');
+        if (lastDotIndex > 0) {
+          const ext = name.substring(lastDotIndex);
+          const nameWithoutExt = name.substring(0, lastDotIndex);
+          const maxNameLength = maxLength - ext.length - 3; // 3 for "..."
+          
+          if (nameWithoutExt.length > maxNameLength) {
+            return nameWithoutExt.substring(0, maxNameLength) + '...' + ext;
+          }
+        }
+        
+        // 如果没有扩展名或扩展名太长，直接截断
+        return name.substring(0, maxLength - 3) + '...';
+      }
+
+      function renderShelf(books) {
+        shelfList.innerHTML = '';
+        if (!books.length) { shelfEmpty.style.display = 'block'; return; }
+        shelfEmpty.style.display = 'none';
+        books.sort((a, b) => (b.lastOpened || b.addedAt || 0) - (a.lastOpened || a.addedAt || 0));
+        for (const bk of books) {
+          const row = document.createElement('div');
+          row.className = 'book';
+          const inner = document.createElement('div');
+          inner.className = 'book-inner';
+          // 信息区
+          const info = document.createElement('div');
+          info.className = 'book-info';
+          const title = document.createElement('div');
+          title.className = 'book-title';
+          title.textContent = formatBookName(bk.name);
+          title.title = bk.name;
+          const textContent = document.createElement('div');
+          textContent.style.cssText = 'flex: 1; min-width: 0;';
+          textContent.appendChild(title);
+          info.appendChild(textContent);
+          inner.appendChild(info);
+          row.appendChild(inner);
+          // 编辑模式下显示删除按钮
+          const delWrap = document.createElement('div');
+          delWrap.className = 'book-delete';
+          const delBtn = document.createElement('button');
+          delBtn.className = 'btn';
+          delBtn.textContent = '删除';
+          delBtn.addEventListener('click', async (ev) => {
+            ev.stopPropagation();
+            if (!confirm(`删除"${bk.name}"？`)) return;
+            await idbDeleteBook(bk.id);
+            setStatus('已删除');
+            refreshShelf();
+          });
+          delWrap.appendChild(delBtn);
+          inner.appendChild(delWrap);
+          // 行点击打开
+          row.addEventListener('click', () => { if (!shelfEditMode) openBookFromShelf(bk); });
+          shelfList.appendChild(row);
+        }
+      }
+
+      async function refreshShelf() {
+        try {
+          console.log('开始刷新书柜');
+        const books = await idbGetAllBooks();
+          console.log('从IndexedDB获取的书籍:', books);
+        renderShelf(books);
+          console.log('书柜渲染完成');
+        } catch (error) {
+          console.error('刷新书柜失败:', error);
+          setStatus('刷新书柜失败: ' + error.message);
+        }
+      }
+
+      function openShelf() { closeAllSidebars('shelf'); shelfEl.classList.add('open'); refreshShelf(); }
+      function closeShelf() { shelfEl.classList.remove('open'); }
+
+
+
+      // 计算标记在文档中的出现次数
+      function countMarkOccurrences(term) {
+        let count = 0;
+        
+        // 在当前文档中查找
+        const markedElements = document.querySelectorAll(`.marked-word[data-term="${CSS.escape(term)}"]`);
+        count += markedElements.length;
+        
+        // 如果是EPUB，在iframe中查找
+        if (currentFormat === 'epub' && rendition) {
+          try {
+            const contents = rendition.getContents();
+            for (const content of contents) {
+              const epubMarked = content.document.querySelectorAll(`.marked-word[data-term="${CSS.escape(term)}"]`);
+              count += epubMarked.length;
+            }
+          } catch {}
+        }
+        
+        // 如果是HTML iframe，在iframe中查找
+        if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+          const iframeMarked = currentIframe.contentDocument.querySelectorAll(`.marked-word[data-term="${CSS.escape(term)}"]`);
+          count += iframeMarked.length;
+        }
+        
+        return count;
+      }
+
+
+
+      async function addFileToShelf(file) {
+        try {
+          if (!file) {
+            console.error('addFileToShelf: 文件为空');
+            return;
+          }
+          
+          console.log('开始添加文件到书柜:', file.name, file.size);
+          
+        const id = crypto.randomUUID();
+        const format = detectFormatByName(file.name);
+          let blob = null; 
+          let hasBlob = false;
+          
+          if (file.size <= MAX_CACHE_BYTES) { 
+            blob = file; 
+            hasBlob = true; 
+            console.log('文件将被缓存');
+          } else {
+            console.log('文件太大，不会被缓存');
+          }
+          
+        const rec = {
+          id,
+          name: file.name,
+          size: file.size,
+          type: file.type || '',
+          format,
+          addedAt: Date.now(),
+          lastOpened: 0,
+          hasBlob,
+          blob: hasBlob ? blob : null
+        };
+          
+          console.log('准备保存到IndexedDB:', rec);
+        await idbPutBook(rec);
+          console.log('文件已保存到IndexedDB');
+          
+        setStatus('已加入书柜');
+          await refreshShelf();
+          console.log('书柜已刷新');
+          
+          return rec;
+        } catch (error) {
+          console.error('addFileToShelf 失败:', error);
+          setStatus('添加文件失败: ' + error.message);
+          throw error;
+        }
+      }
+
+      async function addCurrentToShelf() {
+        if (!currentFile) { alert('当前未打开文件'); return; }
+        await addFileToShelf(currentFile);
+      }
+
+                    async function openBookFromShelf(bk) {
+         let file = null;
+         if (bk.hasBlob && bk.blob) {
+           try {
+             file = new File([bk.blob], bk.name, { type: bk.type || '' });
+           } catch {
+             // Fallback: Blob without File constructor
+             file = bk.blob;
+             file.name = bk.name;
+           }
+         } else {
+           // Need user to link file from disk
+           const picked = await pickFileForShelfLink();
+           if (!picked) { setStatus('未选择文件'); return; }
+           file = picked;
+           // Optionally cache if small
+           if (file.size <= MAX_CACHE_BYTES) {
+             bk.hasBlob = true;
+             bk.blob = file;
+           }
+           bk.name = file.name;
+           bk.size = file.size;
+           bk.type = file.type || '';
+           bk.format = detectFormatByName(file.name);
+           await idbPutBook(bk);
+         }
+         // open and update lastOpened
+         await openFile(file);
+         bk.lastOpened = Date.now();
+         await idbPutBook(bk);
+         setStatus(`已打开：${bk.name}`);
+       }
+
+      function pickFileForShelfLink() {
+        return new Promise((resolve) => {
+          console.log('开始文件链接选择');
+          
+          const handler = (e) => {
+            console.log('文件链接选择事件触发');
+            const f = e.target.files && e.target.files[0];
+            console.log('选择的链接文件:', f);
+            shelfLinkInput.value = '';
+            resolve(f || null);
+          };
+          
+          // 移除之前的事件监听器
+          shelfLinkInput.removeEventListener('change', handler);
+          shelfLinkInput.addEventListener('change', handler, { once: true });
+          
+          console.log('触发文件链接选择器');
+          try {
+            shelfLinkInput.click();
+          } catch (error) {
+            console.error('文件链接选择器点击失败:', error);
+            shelfLinkInput.dispatchEvent(new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            }));
+          }
+        });
+      }
+
+
+
+      function pickFileForAdd() {
+        return new Promise((resolve) => {
+          console.log('开始文件选择');
+          
+          const handler = (e) => {
+            console.log('文件选择事件触发');
+            const f = e.target.files && e.target.files[0];
+            console.log('选择的文件:', f);
+            shelfAddInput.value = '';
+            resolve(f || null);
+          };
+          
+          // 移除之前的事件监听器
+          shelfAddInput.removeEventListener('change', handler);
+          shelfAddInput.addEventListener('change', handler, { once: true });
+          
+          console.log('触发文件选择器');
+          try {
+            shelfAddInput.click();
+          } catch (error) {
+            console.error('文件选择器点击失败:', error);
+            // 尝试备用方法
+            shelfAddInput.dispatchEvent(new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            }));
+          }
+        });
+      }
+
+      // Drag & drop
+      const prevent = (ev) => { ev.preventDefault(); ev.stopPropagation(); };
+      ['dragenter','dragover','dragleave','drop'].forEach(evt => {
+        window.addEventListener(evt, prevent);
+        viewer.addEventListener(evt, prevent);
+      });
+      window.addEventListener('drop', (ev) => {
+        const file = ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0];
+        if (file) openFile(file);
+      });
+      // iOS 风格触摸手势支持
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchEndX = 0;
+      let touchEndY = 0;
+      let isSwiping = false;
+      const SWIPE_THRESHOLD = 50;
+      const SWIPE_VELOCITY_THRESHOLD = 0.3;
+
+      // 触摸开始
+      viewer.addEventListener('touchstart', (ev) => {
+        if (ev.touches.length === 1) {
+          touchStartX = ev.touches[0].clientX;
+          touchStartY = ev.touches[0].clientY;
+          isSwiping = false;
+        }
+      }, { passive: true });
+
+      // 触摸移动
+      viewer.addEventListener('touchmove', (ev) => {
+        if (ev.touches.length === 1 && !isSwiping) {
+          const deltaX = Math.abs(ev.touches[0].clientX - touchStartX);
+          const deltaY = Math.abs(ev.touches[0].clientY - touchStartY);
+          
+          // 如果水平移动距离大于垂直移动距离，且超过阈值，则认为是滑动手势
+          if (deltaX > deltaY && deltaX > 10) {
+            isSwiping = true;
+          }
+        }
+      }, { passive: true });
+
+      // 触摸结束 - 处理滑动手势
+      viewer.addEventListener('touchend', (ev) => {
+        if (ev.changedTouches.length === 1 && isSwiping) {
+          touchEndX = ev.changedTouches[0].clientX;
+          touchEndY = ev.changedTouches[0].clientY;
+          
+          const deltaX = touchEndX - touchStartX;
+          const deltaY = touchEndY - touchStartY;
+          const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+          const velocity = distance / (ev.timeStamp - ev.targetTouches?.[0]?.timeStamp || 100);
+          
+          // 水平滑动翻页
+          if (Math.abs(deltaX) > SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY) * 2) {
+            if (deltaX > 0) {
+              // 向右滑动 - 上一页
+              triggerHapticFeedback('light');
+              prevPage();
+            } else {
+              // 向左滑动 - 下一页
+              triggerHapticFeedback('light');
+              nextPage();
+            }
+          }
+          
+          // 垂直滑动 - 显示/隐藏工具栏
+          else if (Math.abs(deltaY) > SWIPE_THRESHOLD && Math.abs(deltaY) > Math.abs(deltaX) * 2) {
+            if (deltaY > 0) {
+              // 向下滑动 - 显示工具栏
+              triggerHapticFeedback('light');
+              showToolbar();
+            } else {
+              // 向上滑动 - 隐藏工具栏
+              triggerHapticFeedback('light');
+              hideToolbar();
+            }
+          }
+        }
+        
+        isSwiping = false;
+      }, { passive: true });
+
+      // iOS 触觉反馈支持
+      function triggerHapticFeedback(type = 'light') {
+        if ('vibrate' in navigator) {
+          switch (type) {
+            case 'light':
+              navigator.vibrate(10);
+              break;
+            case 'medium':
+              navigator.vibrate(20);
+              break;
+            case 'heavy':
+              navigator.vibrate(30);
+              break;
+            case 'success':
+              navigator.vibrate([10, 20, 10]);
+              break;
+            case 'error':
+              navigator.vibrate([20, 10, 20, 10]);
+              break;
+          }
+        }
+      }
+
+      // 工具栏显示/隐藏功能
+      let toolbarVisible = true;
+      let toolbarTimeout = null;
+
+      function showToolbar() {
+        const toolbar = document.querySelector('.toolbar');
+        if (toolbar) {
+          toolbar.style.transform = 'translateY(0)';
+          toolbar.style.opacity = '1';
+          toolbarVisible = true;
+        }
+      }
+
+      function hideToolbar() {
+        const toolbar = document.querySelector('.toolbar');
+        if (toolbar) {
+          toolbar.style.transform = 'translateY(100%)';
+          toolbar.style.opacity = '0';
+          toolbarVisible = false;
+        }
+      }
+
+      // 自动隐藏工具栏
+      function startToolbarAutoHide() {
+        if (toolbarTimeout) {
+          clearTimeout(toolbarTimeout);
+        }
+        toolbarTimeout = setTimeout(() => {
+          if (toolbarVisible) {
+            hideToolbar();
+          }
+        }, 3000);
+      }
+
+      // 用户交互时显示工具栏
+      viewer.addEventListener('touchstart', () => {
+        if (!toolbarVisible) {
+          showToolbar();
+        }
+        startToolbarAutoHide();
+      }, { passive: true });
+
+      // 点击关闭侧边栏
+      viewer.addEventListener('click', (ev) => {
+        // 外部点击关闭侧边栏
+        const themeDrawer = document.querySelector('#themeDrawer');
+        const anyOpen = tocEl.classList.contains('open') || marksEl.classList.contains('open') || shelfEl.classList.contains('open') || (themeDrawer && themeDrawer.classList.contains('open'));
+        if (anyOpen) {
+          // 若点在侧边栏以外，先关闭
+          const target = ev.target;
+          if (target && !(target.closest && (target.closest('.toc') || target.closest('.marks') || target.closest('.shelf') || target.closest('.theme-drawer')))) {
+            closeAllSidebars();
+          }
+        }
+      });
+
+
+
+      function detectFormat(file) {
+        const name = file.name.toLowerCase();
+        if (name.endsWith('.epub')) return 'epub';
+        return 'epub'; // 只支持EPUB格式
+      }
+
+      
+
+      async function openFile(file) {
+        try {
+          if (!file) {
+            throw new Error('文件为空');
+          }
+          
+          cleanup();
+          resetToc();
+          currentFile = file;
+          currentFormat = detectFormat(file);
+          setStatus('加载中…');
+          
+        } catch (error) {
+          console.error('打开文件失败:', error);
+          setStatus(`打开文件失败: ${error.message}`);
+          cleanup();
+          return;
+        }
+        
+
+        
+        // 如果文件不在书柜中，自动添加到书柜（用于自动恢复）
+        let shelfMatch = null;
+        try {
+          const shelfBooks = await idbGetAllBooks();
+          shelfMatch = shelfBooks.find(b => b.name === file.name);
+          if (!shelfMatch && file.size <= MAX_CACHE_BYTES) {
+            shelfMatch = await addFileToShelf(file);
+          }
+        } catch (error) {
+          console.warn('自动添加到书柜失败:', error);
+        }
+
+        if (currentFormat === 'epub') {
+          await ensureJSZip();
+          const buf = file.arrayBuffer ? await file.arrayBuffer() : null;
+          book = ePub(buf || file);
+          viewer.innerHTML = '';
+          rendition = book.renderTo(viewer, { 
+            width: '100%', 
+            height: '100%', 
+            flow: 'paginated', 
+            allowScriptedContent: true,
+            manager: 'continuous'
+          });
+          try { applyFontScale(); } catch {}
+          // 错误监听
+          try {
+            rendition.on && rendition.on('displayError', (e) => {
+              console.error('EPUB 显示错误:', e);
+            });
+          } catch {}
+          
+
+          
+
+          // 已移除：自动匹配默认字体
+
+
+          const savedCfi = localStorage.getItem(keyFor(file, 'cfi'));
+          let displayed = false;
+          const errors = [];
+          // 尝试1：使用保存的 CFI 或默认
+          try {
+            await rendition.display(savedCfi || undefined);
+            displayed = true;
+          } catch (err1) {
+            console.warn('Display with CFI failed', err1);
+            errors.push(err1);
+          }
+          // 尝试2：无 CFI 再渲染
+          if (!displayed) {
+            try {
+              await rendition.display();
+              displayed = true;
+            } catch (err2) {
+              console.warn('Display without CFI failed', err2);
+              errors.push(err2);
+            }
+          }
+          // 尝试3：切换为滚动模式
+          if (!displayed) {
+            try {
+              rendition.flow && rendition.flow('scrolled-doc');
+              await rendition.display();
+              displayed = true;
+            } catch (err3) {
+              console.warn('Display in scrolled-doc failed', err3);
+              errors.push(err3);
+            }
+          }
+          // 尝试4：直接显示第一章 href
+          if (!displayed) {
+            try {
+              const firstItem = (book.spine && (book.spine.get && book.spine.get(0))) || (book.spine && book.spine.spineItems && book.spine.spineItems[0]);
+              const target = firstItem && (firstItem.href || firstItem.cfi || firstItem.url);
+              await rendition.display(target || undefined);
+              displayed = true;
+            } catch (err4) {
+              console.warn('Display by first spine item failed', err4);
+              errors.push(err4);
+            }
+          }
+          if (!displayed) {
+            console.error('无法显示本书，可能为 DRM 或文件损坏。聚合错误：', errors);
+            viewer.innerHTML = '<div class="hint">无法显示此 EPUB，可能含 DRM 或文件损坏。请尝试其他文件。</div>';
+            return;
+          }
+          // 记录上次阅读的书（需书柜记录可用）
+          if (shelfMatch && shelfMatch.id) { setLastOpenedBookId(shelfMatch.id); }
+
+          try {
+            const nav = await book.loaded.navigation;
+            buildEpubToc(nav && (nav.toc || nav));
+          } catch (e) {
+            console.warn('TOC 加载失败', e);
+            try {
+              // 退化：按 spine 构建简易目录
+              const items = (book && book.spine && book.spine.spineItems) || [];
+              if (items.length) {
+                const toc = items.map((it, i) => ({ title: it && (it.id || it.href || ('章节 ' + (i+1))), href: it && it.href }));
+                buildEpubToc(toc);
+              } else {
+                showTocEmpty('无目录');
+              }
+            } catch { showTocEmpty('无目录'); }
+          }
+
+          rendition.on('rendered', () => {
+            try { 
+              // 确保渲染后字体大小按用户设置应用
+              try { applyFontScale(); } catch {}
+              rendition.getContents().forEach(c => {
+                applyMarksToDocument(c.document);
+                // 禁用EPUB内容中的双击放大
+                if (c.document) {
+                  c.document.addEventListener('dblclick', function(event) {
+                    event.preventDefault();
+                  });
+                  // 拦截 EPUB 内脚注点击为气泡
+                  try {
+                    if (!c.document.__footnoteBound) {
+                      c.document.addEventListener('click', (ev) => {
+                        const a = ev.target && (ev.target.closest && ev.target.closest('a'));
+                        if (a && isFootnoteLink(a)) {
+                          ev.preventDefault(); ev.stopPropagation();
+                          // 将 iframe 内的坐标转换到父文档
+                          try {
+                            const elRect = a.getBoundingClientRect();
+                            const frameEl = c.document.defaultView && c.document.defaultView.frameElement;
+                            const frameRect = frameEl ? frameEl.getBoundingClientRect() : {left:0, top:0};
+                            const pageRect = {
+                              left: elRect.left + (frameRect.left||0),
+                              top: elRect.top + (frameRect.top||0),
+                              right: elRect.right + (frameRect.left||0),
+                              bottom: elRect.bottom + (frameRect.top||0),
+                              width: elRect.width, height: elRect.height
+                            };
+                            // 基准 href 用于从 EPUB 资源读取同级文件
+                            const baseHref = (c && c.cfiBase && c.cfiBase.href) || (c && c.href) || '';
+                            handleFootnoteClick(a, c.document, pageRect, baseHref);
+                          } catch { handleFootnoteClick(a, c.document); }
+                          return;
+                        }
+
+                      }, true);
+                      c.document.__footnoteBound = true;
+                    }
+                  } catch {}
+
+                }
+              }); 
+
+            } catch {}
+          });
+
+          rendition.on('relocated', (location) => {
+            try {
+              const cfi = location && location.start && location.start.cfi;
+              if (cfi) localStorage.setItem(keyFor(file, 'cfi'), cfi);
+
+            } catch {}
+          });
+
+          window.addEventListener('keydown', onKey);
+          applyMarksEverywhere();
+          setStatus('EPUB 已加载');
+          // 确保内容在可视区域内
+          setTimeout(() => {
+            ensureContentInViewport();
+          }, 100);
+        } else if (currentFormat === 'md') {
+          const text = await (file.text ? file.text() : Promise.resolve(''));
+          const html = (window.marked ? window.marked.parse(text) : text);
+          originalMarkdownHtml = html;
+          applyMarksEverywhere();
+          setStatus('Markdown 已加载');
+          // 使用分页渲染
+          setTimeout(() => { calculatePages();
+            // 恢复分页阅读位置
+            if (!restoredPageForCurrentFile && currentFile && currentFormat === 'md') {
+              const saved = parseInt(localStorage.getItem(keyFor(currentFile, 'pageIndex')) || '0');
+              if (!Number.isNaN(saved)) { currentPage = Math.max(0, Math.min(totalPages - 1, saved)); displayCurrentPage(); }
+              restoredPageForCurrentFile = true;
+            }
+
+          }, 50);
+          if (shelfMatch && shelfMatch.id) { setLastOpenedBookId(shelfMatch.id); }
+        } else if (currentFormat === 'html') {
+          const text = await (file.text ? file.text() : Promise.resolve(''));
+          viewer.innerHTML = '';
+          const iframe = document.createElement('iframe');
+          iframe.style.border = '0';
+          iframe.style.width = '100%';
+          iframe.style.height = '100%';
+          viewer.appendChild(iframe);
+          currentIframe = iframe;
+          const doc = iframe.contentDocument;
+          doc.open(); doc.write(text); doc.close();
+          try {
+            doc.addEventListener('click', (ev) => {
+              const a = ev.target && (ev.target.closest && ev.target.closest('a'));
+              if (a && isFootnoteLink(a)) {
+                ev.preventDefault(); ev.stopPropagation();
+                handleFootnoteClick(a, doc);
+                return;
+              }
+            }, true);
+          } catch {}
+          buildIframeToc(iframe);
+          try { const base = 18; const sizePx = Math.round(base * fontScale); ensureContentFontStyle(doc, sizePx); } catch {}
+          applyMarksEverywhere();
+          restoreScroll();
+          setStatus('HTML 已加载');
+          // 确保内容在可视区域内
+          setTimeout(() => {
+            ensureContentInViewport();
+          }, 100);
+        } else {
+          const text = await (file.text ? file.text() : Promise.resolve(''));
+          originalTextContent = text;
+          showTocEmpty('此格式无目录');
+          applyMarksEverywhere();
+          setStatus('文本已加载');
+          // 使用分页渲染
+          setTimeout(() => { calculatePages();
+            // 恢复分页阅读位置
+            if (!restoredPageForCurrentFile && currentFile && currentFormat === 'text') {
+              const saved = parseInt(localStorage.getItem(keyFor(currentFile, 'pageIndex')) || '0');
+              if (!Number.isNaN(saved)) { currentPage = Math.max(0, Math.min(totalPages - 1, saved)); displayCurrentPage(); }
+              restoredPageForCurrentFile = true;
+            }
+
+          }, 50);
+          if (shelfMatch && shelfMatch.id) { setLastOpenedBookId(shelfMatch.id); }
+        }
+      }
+
+      function formatLabel(fmt) {
+        switch (fmt) {
+          case 'epub': return 'EPUB';
+          case 'md': return 'Markdown';
+          case 'html': return 'HTML';
+          case 'text': return '文本';
+          default: return '未知';
+        }
+      }
+
+      function cleanup() {
+        // 清理DOM内容
+        if (viewer) {
+          viewer.innerHTML = '<div class="hint">拖拽 EPUB 文件到此处，或从书柜中选择文件</div>';
+        }
+        setStatus('');
+        
+        // 移除事件监听器
+        window.removeEventListener('keydown', onKey);
+        
+        // 清理EPUB相关资源
+        if (rendition) {
+          try { 
+            rendition.destroy(); 
+          } catch (e) {
+            console.warn('清理rendition失败:', e);
+          }
+          rendition = null;
+        }
+        
+        if (book) { 
+          try {
+            // 清理EPUB书籍资源
+            if (book.archive && book.archive.zip) {
+              book.archive.zip = null;
+            }
+            if (book.resources) {
+              book.resources = null;
+            }
+          } catch (e) {
+            console.warn('清理book资源失败:', e);
+          }
+          book = null; 
+        }
+        
+        // 清理iframe
+        if (currentIframe) {
+          try {
+            if (currentIframe.contentDocument) {
+              currentIframe.contentDocument.open();
+              currentIframe.contentDocument.write('');
+              currentIframe.contentDocument.close();
+            }
+          } catch (e) {
+            console.warn('清理iframe失败:', e);
+          }
+          currentIframe = null;
+        }
+        
+        // 清理分页相关变量
+        pageContent = [];
+        currentPage = 0;
+        totalPages = 0;
+        restoredPageForCurrentFile = false;
+        
+        // 清理缓存
+        if (footnotePageCache) {
+          footnotePageCache.clear();
+        }
+        
+        // 强制垃圾回收（如果支持）
+        if (window.gc) {
+          try {
+            window.gc();
+          } catch {}
+        }
+      }
+
+
+
+      // 键盘翻页功能
+
+      function onKey(e) {
+        if (e.key === 'ArrowLeft') { e.preventDefault();
+          if (currentFormat === 'text' || currentFormat === 'md') {
+            if (currentPage > 0) { currentPage--; displayCurrentPage(); }
+          } else { prevPage(); }
+        }
+        if (e.key === 'ArrowRight') { e.preventDefault();
+          if (currentFormat === 'text' || currentFormat === 'md') {
+            if (currentPage < totalPages - 1) { currentPage++; displayCurrentPage(); }
+          } else { nextPage(); }
+        }
+        if (e.key === 'Escape') { closeAllSidebars(); }
+      }
+
+
+
+      // UI 显示/隐藏控制
+      function hasSelectionInDoc(doc) {
+        try {
+          const sel = (doc && doc.getSelection) ? doc.getSelection() : (window.getSelection ? window.getSelection() : null);
+          return sel && String(sel).trim().length > 0;
+        } catch { return false; }
+      }
+
+
+
+
+      async function prevPage() {
+        triggerHapticFeedback('light');
+        if (currentFormat === 'epub' && rendition) {
+          await rendition.prev();
+        } else if (currentFormat === 'text' || currentFormat === 'md') {
+          if (currentPage > 0) {
+            currentPage--;
+            displayCurrentPage();
+          }
+        } else {
+          const currentScroll = viewer.scrollTop;
+          const targetScroll = Math.max(0, currentScroll - Math.floor(viewer.clientHeight * 0.9));
+          viewer.scrollTop = targetScroll;
+        }
+      }
+
+      async function nextPage() {
+        triggerHapticFeedback('light');
+        if (currentFormat === 'epub' && rendition) {
+          await rendition.next();
+        } else if (currentFormat === 'text' || currentFormat === 'md') {
+          const target = Math.min(totalPages - 1, currentPage + 1);
+          if (target !== currentPage) {
+            currentPage = target;
+            displayCurrentPage();
+          }
+        } else {
+          const currentScroll = viewer.scrollTop;
+          const maxScroll = viewer.scrollHeight - viewer.clientHeight;
+          const targetScroll = Math.min(maxScroll, currentScroll + Math.floor(viewer.clientHeight * 0.0));
+          viewer.scrollTop = targetScroll;
+        }
+      }
+
+
+
+      function onScrollSave() {
+        // 分页模式下不保存滚动
+        if (!currentFile) return;
+        if (currentFormat === 'text' || currentFormat === 'md') return;
+        const key = keyFor(currentFile, 'scrollTop');
+        const data = { top: viewer.scrollTop, ts: Date.now() };
+        localStorage.setItem(key, JSON.stringify(data));
+      }
+
+      function restoreScroll() {
+        if (!currentFile) return;
+        if (currentFormat === 'text' || currentFormat === 'md') return; // 分页无需滚动恢复
+        const key = keyFor(currentFile, 'scrollTop');
+        const raw = localStorage.getItem(key);
+        if (!raw) return;
+        try {
+          const { top } = JSON.parse(raw);
+          if (typeof top === 'number') {
+            requestAnimationFrame(() => { viewer.scrollTop = top; });
+          }
+        } catch {}
+      }
+
+      // Font size controls
+      function applyFontScale() {
+        const base = 18; // px
+        const sizePx = Math.round(base * fontScale);
+        (viewer && viewer.style && viewer.style.setProperty('--content-font-size', sizePx + 'px'));
+        try { document.documentElement.style.setProperty('--font-size', sizePx + 'px'); } catch {}
+        if (rendition) {
+          try { rendition.themes.fontSize(sizePx + 'px'); } catch {}
+        }
+        if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+          try { ensureContentFontStyle(currentIframe.contentDocument, sizePx); } catch {}
+        }
+        
+        // 如果当前是分页模式，重新计算分页
+        if (currentFormat === 'text' || currentFormat === 'md') {
+          setTimeout(calculatePages, 50);
+        }
+      }
+      btnSmaller && btnSmaller.addEventListener('click', () => {
+        fontScale = Math.max(0.6, +(fontScale - 0.1).toFixed(2));
+        applyFontScale();
+        saveFont();
+        try { const s = document.querySelector('#themeFont'); if (s) s.value = String(Math.round(18 * fontScale)); } catch {}
+      });
+      btnLarger && btnLarger.addEventListener('click', () => {
+        fontScale = Math.min(2.0, +(fontScale + 0.1).toFixed(2));
+        applyFontScale();
+        saveFont();
+        try { const s = document.querySelector('#themeFont'); if (s) s.value = String(Math.round(18 * fontScale)); } catch {}
+      });
+
+      function saveFont() {
+        localStorage.setItem('reader:fontScale', String(fontScale));
+      }
+      function loadFont() {
+        const v = parseFloat(localStorage.getItem('reader:fontScale') || '1');
+        if (!Number.isNaN(v)) fontScale = v;
+        applyFontScale();
+        try { const s = document.querySelector('#themeFont'); if (s) s.value = String(Math.round(18 * fontScale)); } catch {}
+      }
+
+      
+
+      function ensureContentFontStyle(doc, sizePx) {
+        if (!doc || !doc.head) return;
+        let style = doc.getElementById('content-font-style');
+        if (!style) { style = doc.createElement('style'); style.id = 'content-font-style'; doc.head.appendChild(style); }
+        style.textContent = `html,body{font-size:${sizePx}px;}`;
+      }
+
+
+
+      // TOC events
+      btnToc.addEventListener('click', () => { 
+        triggerHapticFeedback('light');
+        if (tocEl.classList.contains('open')) { closeToc(); } else { openToc(); } 
+      });
+      btnCloseToc.addEventListener('click', () => {
+        triggerHapticFeedback('light');
+        closeToc();
+      });
+
+      // Marks events
+      btnMarks.addEventListener('click', () => { 
+        triggerHapticFeedback('light');
+        if (marksEl.classList.contains('open')) { closeMarks(); } else { openMarks(); } 
+      });
+      btnCloseMarks.addEventListener('click', () => {
+        triggerHapticFeedback('light');
+        closeMarks();
+      });
+      // Theme events
+      (function initThemeWiring(){
+        const btnTheme = document.querySelector('#toggleTheme');
+        const themeDrawer = document.querySelector('#themeDrawer');
+        const btnCloseTheme = document.querySelector('#closeTheme');
+        function openTheme() { closeAllSidebars('theme'); themeDrawer && themeDrawer.classList.add('open'); }
+        function closeTheme() { themeDrawer && themeDrawer.classList.remove('open'); }
+        btnTheme && btnTheme.addEventListener('click', () => { 
+          triggerHapticFeedback('light');
+          if (themeDrawer && themeDrawer.classList.contains('open')) { closeTheme(); } else { openTheme(); } 
+        });
+        btnCloseTheme && btnCloseTheme.addEventListener('click', () => {
+          triggerHapticFeedback('light');
+          closeTheme();
+        });
+        // Event delegation fallback (ensure binding works even if refs are null at load)
+        document.addEventListener('click', (ev) => {
+          const t = ev.target;
+          if (!t || !t.closest) return;
+          if (t.id === 'toggleTheme' || t.closest('#toggleTheme')) {
+            const d = document.querySelector('#themeDrawer');
+            if (!d) return;
+            if (d.classList.contains('open')) {
+              d.classList.remove('open');
+            } else {
+              closeAllSidebars('theme');
+              d.classList.add('open');
+            }
+          }
+          if (t.id === 'closeTheme' || t.closest('#closeTheme')) {
+            const d = document.querySelector('#themeDrawer');
+            d && d.classList.remove('open');
+          }
+        });
+        // state helpers
+        window.saveThemeState = function() {
+          const st = {
+            bg: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+            fg: getComputedStyle(document.documentElement).getPropertyValue('--fg').trim(),
+            accent: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+            panel: getComputedStyle(document.documentElement).getPropertyValue('--panel').trim(),
+            border: getComputedStyle(document.documentElement).getPropertyValue('--border').trim(),
+            muted: getComputedStyle(document.documentElement).getPropertyValue('--muted').trim(),
+            font: getComputedStyle(document.documentElement).getPropertyValue('--font-size').trim(),
+            line: getComputedStyle(document.documentElement).getPropertyValue('--line-height').trim(),
+            radius: getComputedStyle(document.documentElement).getPropertyValue('--radius').trim(),
+
+          };
+          try { localStorage.setItem('reader:theme', JSON.stringify(st)); } catch {}
+        }
+        window.loadThemeState = function() {
+          try {
+            const raw = localStorage.getItem('reader:theme');
+            if (!raw) return;
+            const st = JSON.parse(raw);
+            if (!st || typeof st !== 'object') return;
+            if (st.bg) document.documentElement.style.setProperty('--bg', st.bg);
+            if (st.fg) document.documentElement.style.setProperty('--fg', st.fg);
+            if (st.accent) document.documentElement.style.setProperty('--accent', st.accent);
+            if (st.panel) document.documentElement.style.setProperty('--panel', st.panel);
+            if (st.border) document.documentElement.style.setProperty('--border', st.border);
+            if (st.muted) document.documentElement.style.setProperty('--muted', st.muted);
+            if (st.font) document.documentElement.style.setProperty('--font-size', st.font);
+            if (st.line) document.documentElement.style.setProperty('--line-height', st.line);
+            if (st.radius) document.documentElement.style.setProperty('--radius', st.radius);
+
+          } catch {}
+        }
+        function toColorHex(v){
+          const s = String(v||'').trim();
+          if (/^#[0-9a-fA-F]{3,8}$/.test(s)) return s.length===4?('#'+s[1]+s[1]+s[2]+s[2]+s[3]+s[3]):s.slice(0,7);
+          const m = s.match(/rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i);
+          if (m) { const r=+m[1],g=+m[2],b=+m[3]; return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+          return '#ffffff';
+        }
+        function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+        function updateContentLineHeight(v){
+          const val = String(v || '1.5');
+          try {
+            // 设置根变量供测量等使用
+            document.documentElement.style.setProperty('--line-height', val);
+            // 注入到主文档阅读区域
+            const styleId = 'content-line-height';
+            let st = document.getElementById(styleId);
+            if (!st) { st = document.createElement('style'); st.id = styleId; document.head.appendChild(st); }
+            st.textContent = `#viewer, #viewer .page-content, #viewer .text-content, #viewer .md-content { line-height: ${val} !important; }`;
+          } catch {}
+          try {
+            // 注入到 EPUB iframe 内容
+            if (rendition && rendition.getContents) {
+              rendition.getContents().forEach(c => {
+                try {
+                  const d = c.document;
+                  if (!d || !d.head) return;
+                  let s = d.getElementById('content-line-height');
+                  if (!s) { s = d.createElement('style'); s.id = 'content-line-height'; d.head.appendChild(s); }
+                  s.textContent = `html,body{ line-height: ${val} !important; }`;
+                } catch {}
+              });
+            }
+          } catch {}
+          try {
+            if (currentFormat === 'text' || currentFormat === 'md') {
+              setTimeout(() => { try { calculatePages && calculatePages(); } catch {} }, 60);
+            }
+          } catch {}
+          try { window.saveThemeState && window.saveThemeState(); } catch {}
+        }
+        // 暴露到全局用于初始化调用
+        window.updateContentLineHeight = updateContentLineHeight;
+        window.bindThemeInputsFromVars = function() {
+          const cs = getComputedStyle(document.documentElement);
+          const inputFont = document.querySelector('#themeFont');
+          const inputLine = document.querySelector('#themeLine');
+          try {
+            let storedScale = parseFloat(localStorage.getItem('reader:fontScale') || '');
+            if (Number.isNaN(storedScale)) storedScale = fontScale;
+            const derivedPx = Math.round(18 * (storedScale || 1));
+            const fallbackPx = parseInt((cs.getPropertyValue('--font-size')||'16').trim())||16;
+            const px = clamp(derivedPx || fallbackPx, 12, 22);
+            if (inputFont) inputFont.value = px;
+          } catch { if (inputFont) { const px = clamp(parseInt((cs.getPropertyValue('--font-size')||'16').trim())||16,12,22); inputFont.value = px; } }
+          const lineRaw = parseFloat((cs.getPropertyValue('--line-height')||'1.5').trim())||1.5;
+          inputLine && (inputLine.value = clamp(lineRaw,1.2,2.0));
+        }
+        window.bindThemeEvents = function(){
+          const setVar = (name, value) => { document.documentElement.style.setProperty(name, value); try { window.saveThemeState(); } catch {} try { window.updateStatusBarMeta && window.updateStatusBarMeta(); } catch {} };
+          const applyPreset = (p) => {
+            if (p==='light') {
+              setVar('--bg','#ffffff'); setVar('--fg','#333333'); setVar('--muted','#666666'); setVar('--accent','#0066cc'); setVar('--panel','#f5f5f5'); setVar('--border','#cccccc');
+            } else if (p==='dark') {
+              setVar('--bg','#111111'); setVar('--fg','#e6e6e6'); setVar('--muted','#aaaaaa'); setVar('--accent','#3ea6ff'); setVar('--panel','#1a1a1a'); setVar('--border','#333333');
+            } else if (p==='sepia') {
+              setVar('--bg','#f4ecd8'); setVar('--fg','#4a3b2a'); setVar('--muted','#7d6a55'); setVar('--accent','#a4662b'); setVar('--panel','#efe6d2'); setVar('--border','#d6c9b6');
+            }
+
+            window.bindThemeInputsFromVars();
+          };
+          const resetTheme = () => {
+            setVar('--bg','#ffffff'); setVar('--fg','#333333'); setVar('--muted','#666666'); setVar('--accent','#0066cc'); setVar('--panel','#f5f5f5'); setVar('--border','#cccccc'); setVar('--font-size','16px'); setVar('--line-height','1.5'); setVar('--radius','4px');
+            window.bindThemeInputsFromVars();
+          };
+          const inputFont = document.querySelector('#themeFont');
+          const inputLine = document.querySelector('#themeLine');
+          const btnPresetLight = document.querySelector('#presetLight');
+          const btnPresetDark = document.querySelector('#presetDark');
+          const btnPresetSepia = document.querySelector('#presetSepia');
+          const btnThemeReset = document.querySelector('#themeReset');
+          inputFont && inputFont.addEventListener('input', e=> {
+            const px = parseInt(e.target.value)||16;
+            fontScale = Math.max(0.6, Math.min(2.0, px / 18));
+            applyFontScale();
+            saveFont();
+          });
+          inputLine && inputLine.addEventListener('input', e=> updateContentLineHeight(e.target.value));
+          btnPresetLight && btnPresetLight.addEventListener('click', ()=> applyPreset('light'));
+          btnPresetDark && btnPresetDark.addEventListener('click', ()=> applyPreset('dark'));
+          btnPresetSepia && btnPresetSepia.addEventListener('click', ()=> applyPreset('sepia'));
+          btnThemeReset && btnThemeReset.addEventListener('click', resetTheme);
+        }
+
+        // 状态栏颜色同步（Android 使用 theme-color；iOS 仅支持 default/black 风格切换）
+        function getCssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+        function hexToRgb(hex){
+          const s = String(hex||'').trim();
+          const m = s.match(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/);
+          if (!m) return {r:255,g:255,b:255};
+          let h = m[1];
+          if (h.length===3) h = h.split('').map(c=>c+c).join('');
+          const n = parseInt(h,16); return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+        }
+        function isDarkColor(hex){ const {r,g,b}=hexToRgb(hex); const L=(0.2126*r+0.7152*g+0.0722*b)/255; return L<0.5; }
+        window.updateStatusBarMeta = function(){
+          try {
+            const bg = getCssVar('--bg') || '#ffffff';
+            let meta = document.querySelector('meta[name="theme-color"]');
+            if (!meta) { meta = document.createElement('meta'); meta.setAttribute('name','theme-color'); document.head.appendChild(meta); }
+            meta.setAttribute('content', bg);
+          } catch {}
+          try {
+            // iOS：只能在 default/black/black-translucent 间切换，不支持任意色
+            const bg = getCssVar('--bg') || '#ffffff';
+            const dark = isDarkColor(bg);
+            let ios = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+            if (!ios) { ios = document.createElement('meta'); ios.setAttribute('name','apple-mobile-web-app-status-bar-style'); document.head.appendChild(ios); }
+            ios.setAttribute('content', dark ? 'black' : 'default');
+          } catch {}
+        }
+      })();
+      // Theme events
+      const btnTheme = document.querySelector('#toggleTheme');
+      const themeDrawer = document.querySelector('#themeDrawer');
+      const btnCloseTheme = document.querySelector('#closeTheme');
+      function openTheme() { closeAllSidebars('theme'); themeDrawer && themeDrawer.classList.add('open'); }
+      function closeTheme() { themeDrawer && themeDrawer.classList.remove('open'); }
+      btnTheme && btnTheme.addEventListener('click', () => { if (themeDrawer && themeDrawer.classList.contains('open')) { closeTheme(); } else { openTheme(); } });
+      btnCloseTheme && btnCloseTheme.addEventListener('click', closeTheme);
+
+
+
+             // Shelf events
+       btnShelf.addEventListener('click', () => { 
+         triggerHapticFeedback('light');
+         if (shelfEl.classList.contains('open')) { closeShelf(); } else { openShelf(); } 
+       });
+       btnCloseShelf.addEventListener('click', () => {
+         triggerHapticFeedback('light');
+         closeShelf();
+       });
+
+               
+      btnAddCurrent.addEventListener('click', async () => {
+        try {
+          triggerHapticFeedback('light');
+          console.log('点击了添加当前文件按钮');
+          await addCurrentToShelf();
+        } catch (error) {
+          console.error('添加当前文件失败:', error);
+          setStatus('添加当前文件失败: ' + error.message);
+        }
+      });
+      btnAddFromDisk.addEventListener('click', async () => {
+        try {
+          triggerHapticFeedback('light');
+          console.log('点击了添加文件按钮');
+          
+          // 统一文件选择方法
+          setStatus('正在打开文件选择器...');
+          
+          const f = await pickFileForAdd();
+          console.log('选择的文件:', f);
+          if (f) {
+            setStatus('正在添加文件到书柜...');
+            await addFileToShelf(f);
+            console.log('文件已添加到书柜');
+          } else {
+            console.log('未选择文件');
+            setStatus('未选择文件');
+          }
+        } catch (error) {
+          console.error('添加文件失败:', error);
+          setStatus('添加文件失败: ' + error.message);
+        }
+      });
+
+      // 书柜编辑模式
+      if (btnShelfEdit) {
+        btnShelfEdit.addEventListener('click', () => {
+          shelfEditMode = !shelfEditMode;
+          if (shelfEditMode) {
+            shelfEl.classList.add('edit-mode');
+            btnShelfEdit.textContent = '完成';
+          } else {
+            shelfEl.classList.remove('edit-mode');
+            btnShelfEdit.textContent = '编辑';
+          }
+        });
+      }
+
+      
+
+      
+
+      // Build TOC helpers
+      function renderTocItems(items, parent, onNavigate, level = 1) {
+        if (!items || !items.length) return;
+        items.forEach((item) => {
+          const li = document.createElement('li');
+          li.style.marginLeft = Math.max(0, (level - 1) * 12) + 'px';
+          const btn = document.createElement('button');
+          btn.className = 'toc-item';
+          btn.textContent = (item.label || item.text || item.title || '').trim() || '…';
+          btn.addEventListener('click', () => { onNavigate(item); closeToc(); });
+          li.appendChild(btn);
+          parent.appendChild(li);
+          const children = item.subitems || item.children || [];
+          if (children && children.length) {
+            renderTocItems(children, parent, onNavigate, level + 1);
+          }
+        });
+      }
+
+      function buildEpubToc(toc) {
+        resetToc();
+        if (!toc || !toc.length) { showTocEmpty('无目录'); return; }
+        renderTocItems(toc, tocList, (item) => {
+          if (!rendition) return;
+          const target = item.href || item.hrefFragment || item.cfi;
+          rendition.display(target);
+        });
+      }
+
+      function slugify(text) {
+        return text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-\u4e00-\u9fa5]/g, '').replace(/-+/g, '-').replace(/(^-|-$)/g, '');
+      }
+
+      function buildDocToc(rootEl) {
+        resetToc();
+        const headings = rootEl.querySelectorAll('h1,h2,h3,h4,h5,h6');
+        if (!headings.length) { showTocEmpty('无目录'); return; }
+        const items = [];
+        const used = new Set();
+        headings.forEach((h) => {
+          const level = parseInt(h.tagName.slice(1), 10) || 1;
+          let id = h.id || slugify(h.textContent || '');
+          while (!id || used.has(id)) { id = id + '-' + Math.floor(Math.random() * 1000); }
+          used.add(id);
+          h.id = id;
+          items.push({ title: h.textContent || '', level, id, el: h });
+        });
+        items.forEach((it) => {
+          const li = document.createElement('li');
+          li.style.marginLeft = Math.max(0, (it.level - 1) * 12) + 'px';
+          const btn = document.createElement('button');
+          btn.className = 'toc-item';
+          btn.textContent = (it.title || '').trim() || '…';
+          btn.addEventListener('click', () => { it.el.scrollIntoView({ behavior: 'smooth', block: 'start' }); closeToc(); });
+          li.appendChild(btn);
+          tocList.appendChild(li);
+        });
+      }
+
+      function buildIframeToc(iframe) {
+        try {
+          const doc = iframe.contentDocument;
+          if (!doc) { showTocEmpty('无目录'); return; }
+          const body = doc.body;
+          if (!body) { showTocEmpty('无目录'); return; }
+          resetToc();
+          const headings = body.querySelectorAll('h1,h2,h3,h4,h5,h6');
+          if (!headings.length) { showTocEmpty('无目录'); return; }
+          const items = [];
+          const used = new Set();
+          headings.forEach((h) => {
+            const level = parseInt(h.tagName.slice(1), 10) || 1;
+            let id = h.id || slugify(h.textContent || '');
+            while (!id || used.has(id)) { id = id + '-' + Math.floor(Math.random() * 1000); }
+            used.add(id);
+            h.id = id;
+            items.push({ title: h.textContent || '', level, id, el: h });
+          });
+          items.forEach((it) => {
+            const li = document.createElement('li');
+            li.style.marginLeft = Math.max(0, (it.level - 1) * 12) + 'px';
+            const btn = document.createElement('button');
+            btn.className = 'toc-item';
+            btn.textContent = (it.title || '').trim() || '…';
+            btn.addEventListener('click', () => { it.el.scrollIntoView({ behavior: 'smooth', block: 'start' }); closeToc(); });
+            li.appendChild(btn);
+            tocList.appendChild(li);
+          });
+        } catch (e) {
+          console.warn('HTML 目录生成失败', e);
+          showTocEmpty('无目录');
+        }
+      }
+
+      // ---- Mark actions ----
+      function selectLocalImage() {
+        return new Promise((resolve) => {
+          const handler = (e) => {
+            const f = e.target.files && e.target.files[0];
+            markImageInput.value = '';
+            resolve(f || null);
+          };
+          markImageInput.addEventListener('change', handler, { once: true });
+          markImageInput.click();
+        });
+      }
+      function readFileAsDataURL(file) {
+        return new Promise((resolve, reject) => {
+          // 检查文件类型
+          console.log('处理图片文件:', file.name, '类型:', file.type, '大小:', file.size);
+          
+          const fr = new FileReader();
+          fr.onload = () => {
+            const result = String(fr.result || '');
+            console.log('图片读取成功，数据URL长度:', result.length);
+            resolve(result);
+          };
+          fr.onerror = () => {
+            console.error('图片读取失败:', fr.error);
+            reject(fr.error || new Error('读取失败'));
+          };
+          fr.readAsDataURL(file);
+        });
+      }
+
+      function getSelectedText() {
+        let text = (window.getSelection && window.getSelection().toString()) || '';
+        text = text.trim();
+        if (text) return text;
+        if (rendition) {
+          try {
+            const contents = rendition.getContents();
+            for (const c of contents) {
+              const t = c.window && c.window.getSelection && c.window.getSelection().toString().trim();
+              if (t) return t;
+            }
+          } catch {}
+        }
+        if (currentIframe && currentIframe.contentWindow) {
+          try {
+            const t = currentIframe.contentWindow.getSelection().toString().trim();
+            if (t) return t;
+          } catch {}
+        }
+        return '';
+      }
+
+      // 检查文字是否存在于当前文档中
+      function checkTextExists(term) {
+        if (!term) return false;
+        
+        // 检查主文档
+        if (document.body && document.body.textContent.includes(term)) {
+          return true;
+        }
+        
+        // 检查EPUB内容
+        if (currentFormat === 'epub' && rendition) {
+          try {
+            const contents = rendition.getContents();
+            for (const c of contents) {
+              if (c.document && c.document.body && c.document.body.textContent.includes(term)) {
+                return true;
+              }
+            }
+          } catch {}
+        }
+        
+        // 检查HTML iframe
+        if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+          if (currentIframe.contentDocument.body && currentIframe.contentDocument.body.textContent.includes(term)) {
+            return true;
+          }
+        }
+        
+        return false;
+      }
+      
+      // 获取文档中所有文字，用于搜索建议
+      function getAllTextFromDocument() {
+        const texts = [];
+        
+        // 获取主文档文字
+        if (document.body) {
+          const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+          );
+          
+          let node;
+          while (node = walker.nextNode()) {
+            const text = node.textContent.trim();
+            if (text && text.length > 2) {
+              texts.push(text);
+            }
+          }
+        }
+        
+        // 获取EPUB文字
+        if (currentFormat === 'epub' && rendition) {
+          try {
+            const contents = rendition.getContents();
+            for (const c of contents) {
+              if (c.document && c.document.body) {
+                const walker = c.document.createTreeWalker(
+                  c.document.body,
+                  NodeFilter.SHOW_TEXT,
+                  null,
+                  false
+                );
+                
+                let node;
+                while (node = walker.nextNode()) {
+                  const text = node.textContent.trim();
+                  if (text && text.length > 2) {
+                    texts.push(text);
+                  }
+                }
+              }
+            }
+          } catch {}
+        }
+        
+        // 获取HTML iframe文字
+        if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+          if (currentIframe.contentDocument.body) {
+            const walker = currentIframe.contentDocument.createTreeWalker(
+              currentIframe.contentDocument.body,
+              NodeFilter.SHOW_TEXT,
+              null,
+              false
+            );
+            
+            let node;
+            while (node = walker.nextNode()) {
+              const text = node.textContent.trim();
+              if (text && text.length > 2) {
+                texts.push(text);
+              }
+            }
+          }
+        }
+        
+        return texts;
+      }
+      
+      // 搜索相似文字
+      function findSimilarText(term, maxResults = 5) {
+        const allTexts = getAllTextFromDocument();
+        const similar = [];
+        
+        for (const text of allTexts) {
+          // 简单的相似度计算
+          if (text.includes(term) || term.includes(text) || 
+              text.toLowerCase().includes(term.toLowerCase()) ||
+              term.toLowerCase().includes(text.toLowerCase())) {
+            similar.push(text);
+            if (similar.length >= maxResults) break;
+          }
+        }
+        
+        return similar;
+      }
+      
+      // 搜索文字并跳转到第一个匹配位置
+      function searchAndJumpToText(term) {
+        if (!term) return false;
+        
+        // 搜索主文档
+        if (document.body && document.body.textContent.includes(term)) {
+          // 高亮并滚动到第一个匹配位置
+          const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+          );
+          
+          let node;
+          while (node = walker.nextNode()) {
+            if (node.textContent.includes(term)) {
+              node.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              // 临时高亮
+              const range = document.createRange();
+              const startIndex = node.textContent.indexOf(term);
+              range.setStart(node, startIndex);
+              range.setEnd(node, startIndex + term.length);
+              
+              const selection = window.getSelection();
+              selection.removeAllRanges();
+              selection.addRange(range);
+              
+              // 3秒后清除选择
+              setTimeout(() => {
+                selection.removeAllRanges();
+              }, 3000);
+              
+              return true;
+            }
+          }
+        }
+        
+        // 搜索EPUB内容
+        if (currentFormat === 'epub' && rendition) {
+          try {
+            const contents = rendition.getContents();
+            for (const c of contents) {
+              if (c.document && c.document.body && c.document.body.textContent.includes(term)) {
+                // 跳转到包含该文字的页面
+                const cfi = c.cfi;
+                if (cfi) {
+                  rendition.display(cfi);
+                  setTimeout(() => {
+                    // 在页面加载后搜索并高亮
+                    searchAndJumpToText(term);
+                  }, 500);
+                  return true;
+                }
+              }
+            }
+          } catch {}
+        }
+        
+        // 搜索HTML iframe
+        if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+          if (currentIframe.contentDocument.body && currentIframe.contentDocument.body.textContent.includes(term)) {
+            const walker = currentIframe.contentDocument.createTreeWalker(
+              currentIframe.contentDocument.body,
+              NodeFilter.SHOW_TEXT,
+              null,
+              false
+            );
+            
+            let node;
+            while (node = walker.nextNode()) {
+              if (node.textContent.includes(term)) {
+                node.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return true;
+              }
+            }
+          }
+        }
+        
+        return false;
+      }
+
+      function isFootnoteLink(el){
+        if (!el || el.tagName !== 'A') return false;
+        if (isInsideFootnoteArea(el)) return false; // 注释区域内的链接不弹气泡
+        const href = el.getAttribute('href') || '';
+        const hasFragment = href.includes('#');
+        const hasNoterefAttr = /\bnoteref\b/i.test(el.getAttribute('epub:type')||'') || /\bdoc-noteref\b/i.test(el.getAttribute('role')||'') || /footnote/i.test(el.getAttribute('rel')||'');
+        const hasClass = /(noteref|note-ref|footnote)/i.test(el.className||'');
+        const looksLikeNumber = /\[\d+\]/.test(el.textContent||'') || !!el.closest('sup, .math-super');
+        return hasFragment && (hasNoterefAttr || hasClass || looksLikeNumber);
+      }
+
+      btnMark.addEventListener('click', async () => {
+        let term = getSelectedText();
+        let isDirectInput = false;
+        
+        if (!term) {
+          term = prompt('输入要标记的词：', '') || '';
+          term = term.trim();
+          isDirectInput = true;
+        }
+        
+        // 批量输入支持：使用逗号/分号/换行分隔多个词
+        if (isDirectInput && term) {
+          const parts = term.split(/[,，;；\n\r]+/).map(s => s.trim()).filter(Boolean);
+          if (parts.length > 1) {
+            const unique = Array.from(new Set(parts));
+            let emojiInput = '';
+            try {
+              emojiInput = prompt('输入标记符号（将应用到所有词，例如：⭐️ 或 * 或 !）', '⭐️') || '⭐️';
+            } catch {}
+            const emoji = (emojiInput && emojiInput.trim()) ? emojiInput.trim() : '⭐️';
+            unique.forEach(t => addTermToEmoji(t, emoji));
+            applyMarksEverywhere();
+            if (marksEl.classList.contains('open')) { renderMarksList(); }
+            setStatus(`已标记 ${unique.length} 个词，使用符号：${emoji}`);
+            return;
+          }
+        }
+
+        if (!term) { 
+          setStatus('未选择/输入词'); 
+          return; 
+        }
+        
+        const currentMap = buildTermToEmojiMap();
+        if (currentMap[term]) {
+          const del = confirm(`"${term}"已标记（${currentMap[term]}）。确定取消标记吗？`);
+          if (del) {
+            removeTermFromEmoji(term, currentMap[term]);
+            removeMarksEverywhere(term);
+            setStatus(`已取消标记：${term}`);
+            return;
+          }
+        }
+        
+        // 检查当前页面是否包含要标记的文字
+        if (isDirectInput) {
+          const hasText = checkTextExists(term);
+          if (!hasText) {
+            const action = confirm(
+              `当前页面未找到"${term}"。\n\n` +
+              `选择操作：\n` +
+              `- 点击"确定"：搜索并跳转到包含该文字的位置\n` +
+              `- 点击"取消"：直接标记（在整个文档中生效）`
+            );
+            
+            if (action) {
+              // 搜索并跳转
+              const found = searchAndJumpToText(term);
+              if (found) {
+                setStatus(`已跳转到包含"${term}"的位置，请选择文字后重新标记`);
+                return;
+              } else {
+                // 提供相似文字建议
+                const similar = findSimilarText(term);
+                if (similar.length > 0) {
+                  const suggestions = similar.slice(0, 3).map((s, i) => `${i + 1}. ${s}`).join('\n');
+                  const useSuggestion = confirm(
+                    `未在文档中找到"${term}"，但找到以下相似文字：\n\n${suggestions}\n\n` +
+                    `是否使用第一个建议？\n` +
+                    `- 点击"确定"：使用"${similar[0]}"\n` +
+                    `- 点击"取消"：重新输入`
+                  );
+                  
+                  if (useSuggestion) {
+                    // 使用第一个建议
+                    term = similar[0];
+                    setStatus(`使用建议文字：${term}`);
+                  } else {
+                    return;
+                  }
+                } else {
+                  alert(`未在文档中找到"${term}"`);
+                  return;
+                }
+              }
+            }
+          }
+        }
+        
+        let value = '';
+        try {
+          const input = prompt('输入标记符号（示例：⭐️ / 📌 / ❤️ / 🤔 / * / ! / #）', currentMap[term] || '⭐️') || '';
+          value = ('emoji:' + input.trim());
+        } catch {}
+        if (!value || value === 'emoji:') value = 'emoji:⭐️';
+        addTermToEmoji(term, value.slice(6));
+        applyMarksEverywhere();
+        if (marksEl.classList.contains('open')) {
+          renderMarksList();
+        }
+        
+        const hasText = checkTextExists(term);
+        if (hasText) {
+        setStatus(`已标记：${term}`);
+        } else {
+          setStatus(`已标记：${term}（当前页面未找到，但在整个文档中生效）`);
+        }
+      });
+
+
+
+      // Buttons
+
+
+
+
+      // PWA Service Worker 注册（及时更新 + 自动刷新）
+      // 本地 file:// 运行禁用 SW，避免 CORS 与协议限制
+      if (location.protocol !== 'file:' && 'serviceWorker' in navigator) {
+        // 在注册 SW 前，确保 manifest 使用 PNG 图标
+        (async function ensurePngAppIcons() {
+          try {
+            const link = document.querySelector('link[rel="manifest"]');
+            if (!link) return;
+            const res = await fetch(link.getAttribute('href') || './manifest.json', { cache: 'no-cache' });
+            const manifest = await res.json();
+            // 选取 SVG 源
+            let svgSrc = '';
+            try {
+              const icons = Array.isArray(manifest.icons) ? manifest.icons : [];
+              const first = icons.find(x => (x && typeof x.src === 'string' && x.src.startsWith('data:image/svg+xml')));
+              svgSrc = first ? first.src : '';
+            } catch {}
+            if (!svgSrc) {
+              svgSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMxZjZlZWIiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xOCAySDRjLTEuMSAwLTIgLjktMiAydjE2YzAgMS4xLjkgMiAyIDJoMTRjMS4xIDAgMi0uOSAyLTJWNmMwLTEuMS0uOS0yLTItMnpNMTYgMThINFY0aDEydjE0eiIvPgo8cGF0aCBkPSJNMTAgMTJoNHYyaC00di0yem0wLTRoNHYyaC00Vjh6Ii8+Cjwvc3ZnPgo8L3N2Zz4K';
+            }
+            function svgToPngDataUrl(svgUrl, size) {
+              return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                  try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = size; canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#1f6eeb';
+                    ctx.fillRect(0,0,size,size);
+                    const pad = Math.round(size * 0.12);
+                    ctx.drawImage(img, pad, pad, size - pad*2, size - pad*2);
+                    resolve(canvas.toDataURL('image/png'));
+                  } catch { resolve(''); }
+                };
+                img.onerror = () => resolve('');
+                img.src = svgUrl;
+              });
+            }
+            const png192 = await svgToPngDataUrl(svgSrc, 192);
+            const png512 = await svgToPngDataUrl(svgSrc, 512);
+            if (!png192 || !png512) return;
+            const newManifest = Object.assign({}, manifest, {
+              icons: [
+                { src: png192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+                { src: png512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+              ]
+            });
+            const blob = new Blob([JSON.stringify(newManifest)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            // apple-touch-icon 也替换为 PNG
+            try {
+              let apple = document.querySelector('link[rel="apple-touch-icon"]');
+              if (!apple) { apple = document.createElement('link'); apple.setAttribute('rel','apple-touch-icon'); document.head.appendChild(apple); }
+              apple.setAttribute('href', png192);
+            } catch {}
+          } catch {}
+        })();
+        window.addEventListener('load', async () => {
+          try {
+            const reg = await navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none', scope: './' });
+            const check = () => reg.update().catch(() => {});
+            // 首次、前台切换、定时检查更新
+            check();
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+            setInterval(check, 60 * 60 * 1000);
+
+            // 已有等待中的新 SW，立即切换
+            if (reg.waiting) { reg.waiting.postMessage({ type: 'SKIP_WAITING' }); }
+
+            // 发现新 SW，安装完成后请求立刻接管
+            reg.addEventListener('updatefound', () => {
+              const sw = reg.installing;
+              if (!sw) return;
+              sw.addEventListener('statechange', () => {
+                if (sw.state === 'installed' && reg.waiting) {
+                  reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            });
+
+            // 新 SW 接管后自动刷新页面
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              location.reload();
+            });
+
+            console.log('SW 注册成功:', reg.scope);
+          } catch (error) {
+            console.log('SW 注册失败:', error);
+          }
+        });
+      }
+
+
+
+
+
+      loadFont();
+      
+      // 检查IndexedDB是否可用
+      function checkIndexedDB() {
+        if (!window.indexedDB) {
+          console.error('IndexedDB不可用');
+          setStatus('IndexedDB不可用，书柜功能可能无法正常工作');
+          return false;
+        }
+        console.log('IndexedDB可用');
+              return true;
+            }
+      
+      // 统一设备处理 - 所有设备使用相同的交互
+      function setupUnifiedInteraction() {
+        // 添加触摸手势支持（所有设备）
+        let touchStartY = 0;
+        let touchStartX = 0;
+        
+        const viewer = document.getElementById('viewer');
+        if (viewer) {
+          viewer.addEventListener('touchstart', (e) => {
+            // 确保只在阅读内容区域响应翻页手势
+            const target = e.target;
+            if (target.closest('.toolbar-toggle-btn') || 
+                target.closest('.toolbar') || 
+                target.closest('.toc') || 
+                target.closest('.marks') || 
+                target.closest('.shelf') || 
+                target.closest('.theme-drawer') ||
+                target.closest('button') ||
+                target.closest('input')) {
+              return; // 不处理UI元素的触摸
+            }
+            
+            touchStartY = e.touches[0].clientY;
+            touchStartX = e.touches[0].clientX;
+          }, { passive: true });
+          
+          viewer.addEventListener('touchend', (e) => {
+            // 确保只在阅读内容区域响应翻页手势
+            const target = e.target;
+            if (target.closest('.toolbar-toggle-btn') || 
+                target.closest('.toolbar') || 
+                target.closest('.toc') || 
+                target.closest('.marks') || 
+                target.closest('.shelf') || 
+                target.closest('.theme-drawer') ||
+                target.closest('button') ||
+                target.closest('input')) {
+              return; // 不处理UI元素的触摸
+            }
+            
+            const touchEndY = e.changedTouches[0].clientY;
+            const touchEndX = e.changedTouches[0].clientX;
+            const deltaY = touchStartY - touchEndY;
+            const deltaX = touchStartX - touchEndX;
+            
+            // 垂直滑动距离大于水平滑动距离，且超过50px
+            if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 50) {
+              if (deltaY > 0) {
+                // 向上滑动 - 下一页
+                nextPage();
+              } else {
+                // 向下滑动 - 上一页
+                prevPage();
+              }
+            }
+          }, { passive: true });
+        }
+      }
+      
+      // 初始化检查
+      checkIndexedDB();
+      setupUnifiedInteraction();
+      migrateOldMarksIfAny();
+      
+      // 确保内容在可视区域内的函数
+      function ensureContentInViewport() {
+        const viewer = document.getElementById('viewer');
+        if (viewer && viewer.scrollHeight > viewer.clientHeight) {
+          // 如果内容超出可视区域，调整滚动位置
+          const scrollTop = viewer.scrollTop;
+          const maxScroll = viewer.scrollHeight - viewer.clientHeight;
+          if (scrollTop > maxScroll) {
+            viewer.scrollTop = maxScroll;
+          }
+        }
+      }
+      
+      // 分页系统
+      let currentPage = 0;
+      let totalPages = 0;
+      let pageContent = [];
+      
+      // 计算页面内容
+      function calculatePages() {
+        const viewer = document.getElementById('viewer');
+        if (!viewer || !currentFile) return;
+        
+        // 真正的单页渲染模式 - 使用固定边距
+        const pageW = Math.max(1, Math.round(viewer.clientWidth - 30)); // 左右各15px边距
+        const pageH = Math.max(1, Math.round(viewer.clientHeight - 40)); // 上下各20px边距，预留页脚
+
+        // EPUB格式不需要分页，使用EPUB.js的内置分页
+        return;
+
+        // EPUB格式不需要分页
+        return;
+      }
+      
+      // 分割文本内容
+      
+      
+      // 分割HTML内容
+      
+      
+      // EPUB格式不需要分页显示函数
+
+      // EPUB格式不需要分页测量实现
+      
+      // 处理移动设备视口高度
+      function setViewportHeight() {
+        // 获取实际可视区域高度
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        
+        // 统一处理工具栏高度
+        const toolbar = document.querySelector('.toolbar');
+        const toolbarHeight = toolbar ? toolbar.offsetHeight : 60;
+        document.documentElement.style.setProperty('--toolbar-height', `${toolbarHeight}px`);
+      }
+      
+      // 初始设置
+      setViewportHeight();
+      // 初始化工具栏高度
+      try { 
+        const toolbarEl = document.querySelector('.toolbar');
+        if (toolbarEl) {
+          const h = toolbarEl.offsetHeight;
+          document.documentElement.style.setProperty('--toolbar-height', h + 'px');
+        }
+      } catch {}
+      // 观察 toolbar 高度变化，实时更新 --toolbar-height（用于其他功能）
+      try {
+        const toolbarEl = document.querySelector('.toolbar');
+        const updateToolbarHeight = () => {
+          const h = toolbarEl ? toolbarEl.offsetHeight : 0;
+          document.documentElement.style.setProperty('--toolbar-height', h + 'px');
+        };
+        updateToolbarHeight();
+        if (window.ResizeObserver && toolbarEl) {
+          const ro = new ResizeObserver(() => updateToolbarHeight());
+          ro.observe(toolbarEl);
+        }
+        window.addEventListener('resize', () => setTimeout(updateToolbarHeight, 50));
+        window.addEventListener('orientationchange', () => setTimeout(updateToolbarHeight, 120));
+      } catch {}
+      // 恢复上次阅读的书（若存在缓存）
+      restoreLastBook();
+      
+      // 监听窗口大小变化（去抖）
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        setViewportHeight();
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (currentFormat === 'text' || currentFormat === 'md') {
+            calculatePages();
+          }
+        }, 120);
+      });
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+          setViewportHeight();
+          if (currentFormat === 'text' || currentFormat === 'md') {
+            calculatePages();
+          }
+        }, 150);
+      });
+      
+      // 禁用双击放大
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, false);
+      
+      // 禁用双击选择
+      document.addEventListener('dblclick', function(event) {
+        event.preventDefault();
+      });
+      
+
+      
+      // 错误边界处理
+      window.addEventListener('error', (event) => {
+        console.error('应用错误:', event.error);
+        setStatus('应用发生错误，请刷新页面重试');
+      });
+      
+      window.addEventListener('unhandledrejection', (event) => {
+        console.error('未处理的Promise拒绝:', event.reason);
+        setStatus('操作失败，请重试');
+      });
+      
+      // 初始化完成
+      // Theme load/bind after initial vars
+      (function initTheme(){
+        // 调试：检查边距变量是否正确设置
+        setTimeout(() => {
+          const cs = getComputedStyle(document.documentElement);
+          const pageMargin = cs.getPropertyValue('--page-margin');
+          const pageSpacing = cs.getPropertyValue('--page-spacing');
+          console.log('初始化边距变量:', { pageMargin, pageSpacing });
+        }, 1000);
+        try { 
+          window.loadThemeState && window.loadThemeState(); 
+        } catch (e) {
+          console.warn('加载主题状态失败:', e);
+        }
+        
+        try { 
+          window.bindThemeInputsFromVars && window.bindThemeInputsFromVars(); 
+        } catch (e) {
+          console.warn('绑定主题输入失败:', e);
+        }
+        
+        try { 
+          window.bindThemeEvents && window.bindThemeEvents(); 
+        } catch (e) {
+          console.warn('绑定主题事件失败:', e);
+        }
+        
+        try { 
+          window.updateStatusBarMeta && window.updateStatusBarMeta(); 
+        } catch (e) {
+          console.warn('更新状态栏失败:', e);
+        }
+        
+        // 初始化时同步一次内容行距（用当前变量）
+        try {
+          const cs = getComputedStyle(document.documentElement);
+          const lh = cs.getPropertyValue('--line-height') || '1.5';
+          window.updateContentLineHeight && window.updateContentLineHeight(lh.trim());
+        } catch (e) {
+          console.warn('同步内容行距失败:', e);
+        }
+        
+        // 清理任何遗留的脚注遮罩，避免拦截点击
+        try { 
+          (typeof __closeFootnotePopover === 'function' ? __closeFootnotePopover : closeFootnotePopover)(); 
+        } catch (e) {
+          console.warn('清理脚注遮罩失败:', e);
+        }
+        
+
+
+      })();
+      
+      // 初始化DOM缓存
+      try {
+        domCache.init();
+      } catch (e) {
+        console.warn('初始化DOM缓存失败:', e);
+      }
+      
+      setStatus('准备就绪');
+      
+      // 底部工具栏翻页按钮
+      (function initToolbarPageButtons(){
+        const prevBtn = document.getElementById('prevPageBtn');
+        const nextBtn = document.getElementById('nextPageBtn');
+        
+        if (!prevBtn || !nextBtn) return;
+        
+        // 上一页按钮
+        prevBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          prevPage();
+        });
+        
+        // 下一页按钮
+        nextBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          nextPage();
+        });
+        
+        // 防止工具栏内的触摸事件被翻页手势捕获
+        document.querySelector('.toolbar')?.addEventListener('touchstart', (e) => {
+          e.stopPropagation();
+        }, { passive: false });
+        
+        document.querySelector('.toolbar')?.addEventListener('touchend', (e) => {
+          e.stopPropagation();
+        }, { passive: false });
+        
+        // 键盘快捷键支持
+        document.addEventListener('keydown', (e) => {
+          // 左右箭头键翻页
+          if (e.key === 'ArrowLeft' && !e.target.matches('input, textarea')) {
+            e.preventDefault();
+            prevPage();
+          } else if (e.key === 'ArrowRight' && !e.target.matches('input, textarea')) {
+            e.preventDefault();
+            nextPage();
+          }
+        });
+      })();
+      
+      // 侧边栏背景遮罩管理
+      (function initSidebarOverlay(){
+        const overlay = document.getElementById('sidebarOverlay');
+        const toc = document.getElementById('toc');
+        const marks = document.getElementById('marks');
+        const shelf = document.getElementById('shelf');
+        const themeDrawer = document.querySelector('#themeDrawer');
+        
+        if (!overlay) return;
+        
+        // 显示遮罩
+        function showOverlay() {
+          overlay.classList.add('visible');
+        }
+        
+        // 隐藏遮罩
+        function hideOverlay() {
+          overlay.classList.remove('visible');
+        }
+        
+        // 检查是否有侧边栏打开
+        function checkSidebarOpen() {
+          const anyOpen = toc?.classList.contains('open') || 
+                         marks?.classList.contains('open') || 
+                         shelf?.classList.contains('open') || 
+                         themeDrawer?.classList.contains('open');
+          
+          if (anyOpen) {
+            showOverlay();
+          } else {
+            hideOverlay();
+          }
+        }
+        
+        // 点击遮罩关闭所有侧边栏
+        overlay.addEventListener('click', () => {
+          toc?.classList.remove('open');
+          marks?.classList.remove('open');
+          shelf?.classList.remove('open');
+          themeDrawer?.classList.remove('open');
+          hideOverlay();
+        });
+        
+        // 监听侧边栏状态变化
+        const observer = new MutationObserver(() => {
+          checkSidebarOpen();
+        });
+        
+        [toc, marks, shelf, themeDrawer].forEach(el => {
+          if (el) {
+            observer.observe(el, {
+              attributes: true,
+              attributeFilter: ['class']
+            });
+          }
+        });
+        
+        // 初始化检查
+        checkSidebarOpen();
+      })();
+
+      // 优化：使用防抖函数减少频繁操作
+      function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
+
+      // 优化：缓存DOM查询结果
+      const domCache = {
+        viewer: null,
+        toolbar: null,
+        tocEl: null,
+        marksEl: null,
+        shelfEl: null,
+        themeDrawer: null,
+        
+        init() {
+          this.viewer = document.getElementById('viewer');
+          this.toolbar = document.querySelector('.toolbar');
+          this.tocEl = document.getElementById('toc');
+          this.marksEl = document.getElementById('marks');
+          this.shelfEl = document.getElementById('shelf');
+          this.themeDrawer = document.querySelector('#themeDrawer');
+        },
+        
+        get(selector) {
+          return document.querySelector(selector);
+        }
+      };
+
+      // 优化：改进事件委托
+      function addEventDelegate(container, eventType, selector, handler) {
+        container.addEventListener(eventType, (event) => {
+          const target = event.target.closest(selector);
+          if (target && container.contains(target)) {
+            handler.call(target, event);
+          }
+        });
+      }
+
+      // 优化：改进分页计算性能
+      const calculatePagesOptimized = debounce(() => {
+        calculatePages();
+      }, 150);
+
+      // 优化：改进滚动处理
+      const handleScrollOptimized = debounce(() => {
+        onScrollSave();
+      }, 100);
+    })();
+  </script>
+</body>
+</html>
