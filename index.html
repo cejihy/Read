@@ -3053,83 +3053,100 @@
           }
         }
         
-        // 应用字体到内容
-        function applyFontFamily(fontFamily) {
-          currentFontFamily = fontFamily;
-          
-          // 设置CSS变量
-          let fontStack = '';
-          switch (fontFamily) {
-            case 'system':
-              fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-              break;
-            case 'serif':
-              fontStack = 'Georgia, "Times New Roman", serif';
-              break;
-            case 'sans-serif':
-              fontStack = 'Arial, Helvetica, sans-serif';
-              break;
-            case 'monospace':
-              fontStack = '"Courier New", Courier, monospace';
-              break;
-            case 'custom':
-              // 使用第一个自定义字体，如果没有则使用系统字体
-              if (customFonts.size > 0) {
-                const firstFont = customFonts.keys().next().value;
-                fontStack = `"${firstFont}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-              } else {
-                fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-              }
-              break;
-            default:
-              fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-          }
-          
-          document.documentElement.style.setProperty('--content-font-family', fontStack);
-          
-          // 应用到EPUB内容
-          if (rendition && rendition.themes) {
-            try {
-              rendition.themes.fontFamily(fontStack);
-            } catch (error) {
-              console.error('应用字体到EPUB失败:', error);
-            }
-          }
-          
-          // 应用到其他格式的内容
-          if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
-            try {
-              const doc = currentIframe.contentDocument;
-              let style = doc.getElementById('content-font-family');
-              if (!style) {
-                style = doc.createElement('style');
-                style.id = 'content-font-family';
-                doc.head.appendChild(style);
-              }
-              style.textContent = `html, body { font-family: ${fontStack} !important; }`;
-            } catch (error) {
-              console.error('应用字体到HTML内容失败:', error);
-            }
-          }
-          
-          // 应用到文本和Markdown内容
-          if (currentFormat === 'text' || currentFormat === 'md') {
-            try {
-              const styleId = 'content-font-family';
-              let style = document.getElementById(styleId);
-              if (!style) {
-                style = document.createElement('style');
-                style.id = styleId;
-                document.head.appendChild(style);
-              }
-              style.textContent = `#viewer, #viewer .page-content, #viewer .text-content, #viewer .md-content { font-family: ${fontStack} !important; }`;
-            } catch (error) {
-              console.error('应用字体到文本内容失败:', error);
-            }
-          }
-          
-          saveFontSettings();
-        }
+                 // 应用字体到内容
+         function applyFontFamily(fontFamily) {
+           currentFontFamily = fontFamily;
+           
+           // 设置CSS变量
+           let fontStack = '';
+           switch (fontFamily) {
+             case 'system':
+               fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+               break;
+             case 'serif':
+               fontStack = 'Georgia, "Times New Roman", serif';
+               break;
+             case 'sans-serif':
+               fontStack = 'Arial, Helvetica, sans-serif';
+               break;
+             case 'monospace':
+               fontStack = '"Courier New", Courier, monospace';
+               break;
+             case 'custom':
+               // 使用第一个自定义字体，如果没有则使用系统字体
+               if (customFonts.size > 0) {
+                 const firstFont = customFonts.keys().next().value;
+                 fontStack = `"${firstFont}", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+               } else {
+                 fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+               }
+               break;
+             default:
+               fontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+           }
+           
+           document.documentElement.style.setProperty('--content-font-family', fontStack);
+           
+           // 应用到EPUB内容
+           if (rendition && rendition.themes) {
+             try {
+               rendition.themes.fontFamily(fontStack);
+               // 强制重新渲染EPUB内容
+               if (rendition.location) {
+                 rendition.display(rendition.location.start.cfi);
+               }
+             } catch (error) {
+               console.error('应用字体到EPUB失败:', error);
+             }
+           }
+           
+           // 应用到其他格式的内容
+           if (currentFormat === 'html' && currentIframe && currentIframe.contentDocument) {
+             try {
+               const doc = currentIframe.contentDocument;
+               let style = doc.getElementById('content-font-family');
+               if (!style) {
+                 style = doc.createElement('style');
+                 style.id = 'content-font-family';
+                 doc.head.appendChild(style);
+               }
+               style.textContent = `html, body { font-family: ${fontStack} !important; }`;
+               // 强制重新应用样式
+               doc.body.style.fontFamily = fontStack;
+             } catch (error) {
+               console.error('应用字体到HTML内容失败:', error);
+             }
+           }
+           
+           // 应用到文本和Markdown内容
+           if (currentFormat === 'text' || currentFormat === 'md') {
+             try {
+               const styleId = 'content-font-family';
+               let style = document.getElementById(styleId);
+               if (!style) {
+                 style = document.createElement('style');
+                 style.id = styleId;
+                 document.head.appendChild(style);
+               }
+               style.textContent = `#viewer, #viewer .page-content, #viewer .text-content, #viewer .md-content { font-family: ${fontStack} !important; }`;
+               // 强制重新应用样式到viewer
+               if (viewer) {
+                 viewer.style.fontFamily = fontStack;
+               }
+             } catch (error) {
+               console.error('应用字体到文本内容失败:', error);
+             }
+           }
+           
+           // 强制重新应用标记样式
+           try {
+             applyMarksEverywhere();
+           } catch (error) {
+             console.error('重新应用标记失败:', error);
+           }
+           
+           saveFontSettings();
+         }
         
         window.bindThemeEvents = function(){
           const setVar = (name, value) => { document.documentElement.style.setProperty(name, value); try { window.saveThemeState(); } catch {} try { window.updateStatusBarMeta && window.updateStatusBarMeta(); } catch {} };
